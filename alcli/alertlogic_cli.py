@@ -4,6 +4,7 @@
 import sys
 import os
 import json
+import jmespath
 from json import JSONDecodeError
 import logging
 import argparse
@@ -17,6 +18,8 @@ import almdrlib
 from almdrlib.session import Session
 from almdrlib import __version__ as almdrlib_version
 from almdrlib.client import OpenAPIKeyWord
+from almdrlib.region import Region
+from almdrlib.region import Residency
 
 from alcli.cliparser import ALCliArgsParser
 from alcli.cliparser import USAGE
@@ -31,6 +34,16 @@ LOG_FORMAT = (
 
 #almdrlib.set_logger('almdrlib.session', logging.DEBUG, format_string=LOG_FORMAT)
 
+GLOBAL_ARGUMENTS = [
+        'access_key_id',
+        'secret_key',
+        'profile',
+        'residency',
+        'endpoint',
+        'query',
+        'debug'
+    ]
+
 class AlertLogicCLI(object):
     def __init__(self, session=None):
         self._session = session or Session()
@@ -44,6 +57,7 @@ class AlertLogicCLI(object):
         parser = self._create_parser(services)
 
         parsed_args, remaining = parser.parse_known_args(args)
+        logger.debug(f"Parsed Arguments: {parsed_args}, Remaining: {remaining}")
         
         if parsed_args.service == 'help' or parsed_args.service is None:
             sys.stderr.write(f"usage: {USAGE}\n")
@@ -88,6 +102,14 @@ class AlertLogicCLI(object):
                 "Alert Logic CLI Utility",
                 prog="alcli")
         
+        # Add Global Options
+        parser.add_argument('--access_key_id', dest='access_key_id', default=None)
+        parser.add_argument('--secret_key', dest='secret_key', default=None)
+        parser.add_argument('--profile', dest='profile', default=None)
+        parser.add_argument('--residency', dest='residency', default=None, choices=Residency.list_residencies())
+        parser.add_argument('--endpoint', dest='global_endpoint', default=None, choices=Region.list_endpoints())
+        parser.add_argument('--query', dest='query', default=None)
+        parser.add_argument('--debug', dest='debug', default=False, action="store_true")
         return parser
 
 class ServiceOperation(object):
@@ -108,18 +130,24 @@ class ServiceOperation(object):
         for name, value in parsed_globals.__dict__.items():
             if name == 'operation':
                 operation_name = value
+            elif name == 'debug': 
+                if value:
+                    almdrlib.set_logger('almdrlib', logging.DEBUG, format_string=LOG_FORMAT)
             elif name == 'service':
+                continue
+            elif name in GLOBAL_ARGUMENTS:
                 continue
             else:
                 kwargs[name] = value
         
+        service = self._init_service(parsed_globals)
         # service = self._session.client(self._name)
-        operation = self.operations.get(operation_name, None)
+        operation = service.operations.get(operation_name, None)
         if operation:
             # Remove optional arguments that haven't been supplied
             op_args = {k:self._encode(operation, k, v) for (k,v) in kwargs.items() if v is not None}
             res = operation(**op_args)
-            self._print_result(res.json())
+            self._print_result(res.json(), parsed_globals.query)
 
     @property
     def service(self):
@@ -147,6 +175,11 @@ class ServiceOperation(object):
             self._operations= self.service.operations
         return self._operations
 
+    def _init_service(self, parsed_globals):
+        return self._session.client(
+                self._name,
+                profile=parsed_globals.profile)
+
     def _encode(self, operation, param_name, param_value):
         schema = operation.get_schema()
         parameter = schema[OpenAPIKeyWord.PARAMETERS][param_name]
@@ -172,9 +205,11 @@ class ServiceOperation(object):
         # TODO Raise an exception if we can't build a dictionary from the provided input
         return param_value
 
-    def _print_result(self, result):
+    def _print_result(self, result, query):
+        print(f"QUERY: : {query}")
+        if query:
+            result = jmespath.search(query, result) 
         print(f"{json.dumps(result, sort_keys=True, indent=4)}")
-        return
 
 
 def main():
@@ -182,7 +217,7 @@ def main():
         print("Running in DEBUG mode")
         logging.basicConfig(level=logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.INFO)
+        logging.basicConfig(level=logging.WARNING)
 
     session = Session()
     cli= AlertLogicCLI(session=session)
