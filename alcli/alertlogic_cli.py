@@ -206,7 +206,6 @@ class ServiceOperation(object):
         return param_value
 
     def _print_result(self, result, query):
-        print(f"QUERY: : {query}")
         if query:
             result = jmespath.search(query, result) 
         print(f"{json.dumps(result, sort_keys=True, indent=4)}")
