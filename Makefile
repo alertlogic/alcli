@@ -1,11 +1,17 @@
 VIRTUAL_ENV_LOCATION := ./alcli_env
 VIRTUAL_ENV_ACTIVATE_CMD := $(VIRTUAL_ENV_LOCATION)/bin/activate
 
+BASE := $(shell /bin/pwd)
+PYTHON ?= python
+PIP ?= pip
+
 .PHONY: dist install uninstall init
 .DEFAULT_GOAL := dist
 
 init:
-	pip install -r requirements.txt
+	$(info [+] Installing required packages for '$(NAME)'...")
+	@$(PIP) install -r requirements.txt
+	$(info [*] Installed required packages for '$(NAME)'...")
 
 test:
 	python -m unittest discover -p '*_tests.py' -v -b
@@ -14,7 +20,9 @@ lint:
 	pycodestyle .
 
 dist:
-	python setup.py sdist
+	$(info [+] Building distribution for '$(NAME)'...")
+	@$(PYTHON) setup.py -q sdist
+	$(info [+] Build completed.")
 
 pypi_upload: dist
 	twine upload --skip-existing dist/alcli-*.*

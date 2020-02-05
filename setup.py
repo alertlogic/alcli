@@ -22,7 +22,7 @@ setup(
         ]
     },
     scripts=[],
-    packages=find_packages(exclude=['contrib', 'docs', 'tests*', 'troubleshooting']).append('alcli'),
+    packages=find_packages(exclude=['contrib', 'docs', 'tests*', 'troubleshooting']),
     include_package_data=True,
     zip_safe=False,
     platforms='any',
@@ -40,5 +40,5 @@ setup(
             'pycodestyle>=2.3.1'
         ],
     },
-    keywords=['alcli', 'almdr', 'alertlogic']
+    keywords=['alcli', 'almdr', 'alertlogic', 'alertlogic-cli']
 )
