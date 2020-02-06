@@ -23,8 +23,8 @@ We recommend that you check installed packages version and upgrade to the latest
 	$ pip3 list -o
 	Package    				Version  Latest   Type 
 	---------- 				-------- -------- -----
-	alcli     				1.0.1 	 1.0.2 	  wheel
-	alertlogic-sdk-python   1.0.2 	 1.0.2    wheel
+	alcli     				1.0.1 	 1.0.2 	  sdist
+	alertlogic-sdk-python   1.0.2 	 1.0.2    sdist
 	
 ## Configure the Alert Logic CLI with Your Credentials
 Before you can run a CLI command, you must configure the Alert Logic's CLI with your credentials.
