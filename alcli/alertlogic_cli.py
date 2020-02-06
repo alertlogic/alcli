@@ -3,6 +3,7 @@
 
 import sys
 import os
+import platform
 import json
 import jmespath
 from json import JSONDecodeError
@@ -25,6 +26,7 @@ from alcli.cliparser import ALCliArgsParser
 from alcli.cliparser import USAGE
 from alcli.clihelp import ALCliServiceHelpFormatter
 from alcli.clihelp import ALCliOperationHelpFormatter
+from alcli import __version__ as alcli_version
 
 sys.path.insert(0, os.path.dirname(__file__))
 
@@ -98,7 +100,7 @@ class AlertLogicCLI(object):
     def _create_parser(self, services):
         parser = ALCliArgsParser(
                 services,
-                almdrlib_version,
+                f"alcli/{alcli_version} Python/{platform.python_version()} almdrlib/{almdrlib_version}",
                 "Alert Logic CLI Utility",
                 prog="alcli")
         
