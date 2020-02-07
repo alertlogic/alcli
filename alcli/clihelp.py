@@ -17,13 +17,25 @@ class ALCliHelpFormatter():
     def __init__(self,
                 width=80,
                 indent_increment=2):
+        self._name = ""
         self._width = width
         self._indent_increment = indent_increment
         self._initial_indent = '\t'
         self._subsequent_indent = '\t'
 
+    @property
+    def name(self):
+        return self._name
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+
     def bold(self, msg):
         return f"{FormatHelp.BOLD}{msg}{FormatHelp.END}"
+
+    def underline(self, msg):
+        return f"{FormatHelp.UNDERLINE}{msg}{FormatHelp.END}"
 
     def wraptext(self, text):
         if text is None:
@@ -59,6 +71,40 @@ class ALCliHelpFormatter():
         result = [self.bold("DESCRIPTION")]
         result.extend(self.wraptext(description))
         return '\n'.join(result) + '\n'
+
+class ALCliMainHelpFormatter(ALCliHelpFormatter):
+    def __init__(self,
+                servcices,
+                width=80,
+                indent_increment=2
+                ):
+        super().__init__(width, indent_increment)
+        self._services = servcices
+        self._name = "alcli"
+        self._description = "The Alert Logic Command  Line  Interface is a tool to help you manage Alert Logic Services."
+
+    def make_synopsis(self):
+        command = "\talcli [options] <command> <subcommand> [parameters]"
+        description = f"Use {self.underline('alcli')} {self.underline('command')} {self.underline('help')} for information on a  specific command."
+        return self.bold("SYNOPSIS") + '\n' + '\n\t'.join([command, description]) + '\n'
+
+
+    def make_services(self, services):
+        available_services = [
+                '\to ' + service 
+                for service in services
+            ]
+        return self.bold("AVAIABLE SERVICES") + '\n' + '\n\n'.join(available_services)
+
+    def format_page(self):
+        page = []
+        page.append(self.make_header(self._name))
+        page.append(self.make_description(self._description))
+        page.append(self.make_synopsis())
+        page.append(self.make_services(self._services))
+        page.append(self.make_footer(self._name))
+        return '\n'.join(page)
+
 
 class ALCliServiceHelpFormatter(ALCliHelpFormatter):
     def __init__(self,

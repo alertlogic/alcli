@@ -9,9 +9,6 @@ with open('alcli/__init__.py', 'rb') as f:
     version = str(ast.literal_eval(_version_re.search(
         f.read().decode('utf-8')).group(1)))
 
-with open('HISTORY.rst') as history_file:
-    history = history_file.read()
-
 with open('README.md') as readme_file:
     readme = readme_file.read()
 

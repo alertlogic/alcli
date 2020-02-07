@@ -11,6 +11,7 @@ import logging
 import argparse
 import pydoc
 
+from urllib.parse import urlparse
 from collections import OrderedDict
 from pydoc import pager
 
@@ -24,6 +25,7 @@ from almdrlib.region import Residency
 
 from alcli.cliparser import ALCliArgsParser
 from alcli.cliparser import USAGE
+from alcli.clihelp import ALCliMainHelpFormatter
 from alcli.clihelp import ALCliServiceHelpFormatter
 from alcli.clihelp import ALCliOperationHelpFormatter
 from alcli import __version__ as alcli_version
@@ -62,13 +64,16 @@ class AlertLogicCLI(object):
         logger.debug(f"Parsed Arguments: {parsed_args}, Remaining: {remaining}")
         
         if parsed_args.service == 'help' or parsed_args.service is None:
-            sys.stderr.write(f"usage: {USAGE}\n")
+            help_formatter = ALCliMainHelpFormatter(services.keys())
+            self._show_help(help_formatter)
             return 128
+            #sys.stderr.write(f"usage: {USAGE}\n")
+            #return 128
 
         if parsed_args.operation == 'help':
-            help_page = ALCliServiceHelpFormatter(self._services[parsed_args.service])
-            pydoc.pipepager(help_page.format_page() + '\n', 'less -R')
-            return 0
+            help_formatter = ALCliServiceHelpFormatter(self._services[parsed_args.service])
+            self._show_help(help_formatter)
+            return 128
 
         if hasattr(parsed_args, 'help') and \
                 hasattr(parsed_args, 'service') and \
@@ -80,11 +85,12 @@ class AlertLogicCLI(object):
             return 0
 
 
-        try:
-            return services[parsed_args.service](remaining, parsed_args)
-        except Exception as e:
-            sys.stderr.write(f"Caught exception in main(). Error: {str(e)}\n")
-            return 255
+        return services[parsed_args.service](remaining, parsed_args)
+        #try:
+        #    return services[parsed_args.service](remaining, parsed_args)
+        #except Exception as e:
+        #    sys.stderr.write(f"Caught exception in main(). Error: {str(e)}\n")
+        #    return 255
 
     def _get_services(self):
         if self._services is None:
@@ -113,6 +119,10 @@ class AlertLogicCLI(object):
         parser.add_argument('--query', dest='query', default=None)
         parser.add_argument('--debug', dest='debug', default=False, action="store_true")
         return parser
+
+    def _show_help(self, help_formatter):
+        pydoc.pipepager(help_formatter.format_page() + '\n', 'less -R')
+        return 0
 
 class ServiceOperation(object):
     """
@@ -183,6 +193,12 @@ class ServiceOperation(object):
                 profile=parsed_globals.profile)
 
     def _encode(self, operation, param_name, param_value):
+        p = urlparse(param_value)
+        if p.scheme == "file":
+            value_file_path = os.path.abspath(os.path.join(p.netloc, p.path))
+            with open (value_file_path, "r") as value_file:
+                param_value = value_file.read()
+
         schema = operation.get_schema()
         parameter = schema[OpenAPIKeyWord.PARAMETERS][param_name]
         type = parameter[OpenAPIKeyWord.TYPE]

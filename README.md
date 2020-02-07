@@ -33,7 +33,7 @@ By default, `alcli` uses ~/.alertlogic/config configuration file in a user's hom
 
     [default]
 	access_key_id=1111111111111111
-		secret_key=eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+	secret_key=eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
 	global_endpoint=integration
 	
 	[production]
