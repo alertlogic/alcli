@@ -6,3 +6,8 @@ History
 ------------------
 
 * First release on PyPI.
+
+1.0.7 (2020-02-07)
+------------------
+
+* First version of main help page and bug fixes.
