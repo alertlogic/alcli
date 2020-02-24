@@ -18,10 +18,11 @@ from pydoc import pager
 
 import almdrlib
 from almdrlib.session import Session
-from almdrlib import __version__ as almdrlib_version
+from almdrlib.client import Client
 from almdrlib.client import OpenAPIKeyWord
 from almdrlib.region import Region
 from almdrlib.region import Residency
+from almdrlib import __version__ as almdrlib_version
 
 from alcli.cliparser import ALCliArgsParser
 from alcli.cliparser import USAGE
@@ -86,11 +87,11 @@ class AlertLogicCLI(object):
 
 
         return services[parsed_args.service](remaining, parsed_args)
-        #try:
-        #    return services[parsed_args.service](remaining, parsed_args)
-        #except Exception as e:
-        #    sys.stderr.write(f"Caught exception in main(). Error: {str(e)}\n")
-        #    return 255
+        try:
+            return services[parsed_args.service](remaining, parsed_args)
+        except Exception as e:
+            sys.stderr.write(f"Caught exception in main(). Error: {str(e)}\n")
+            return 255
 
     def _get_services(self):
         if self._services is None:
@@ -132,7 +133,8 @@ class ServiceOperation(object):
     def __init__(self, name, session):
         self._name = name
         self._session = session
-        self._service = None
+        self._client= None
+        #self._service = None
         self._description = None
         self._operations = None
 
@@ -153,7 +155,6 @@ class ServiceOperation(object):
                 kwargs[name] = value
         
         service = self._init_service(parsed_globals)
-        # service = self._session.client(self._name)
         operation = service.operations.get(operation_name, None)
         if operation:
             # Remove optional arguments that haven't been supplied
@@ -162,10 +163,10 @@ class ServiceOperation(object):
             self._print_result(res.json(), parsed_globals.query)
 
     @property
-    def service(self):
-        if self._service is None:
-            self._service = self._session.client(self._name)
-        return self._service
+    def client(self):
+        if self._client is None:
+            self._client = Client(self._name)
+        return self._client
 
     @property
     def name(self):
@@ -178,13 +179,13 @@ class ServiceOperation(object):
     @property
     def description(self):
         if self._description is None:
-            self._description = self.service.description
+            self._description = self.client.description
         return self._description
 
     @property
     def operations(self):
         if self._operations is None:
-            self._operations= self.service.operations
+            self._operations = self.client.operations
         return self._operations
 
     def _init_service(self, parsed_globals):
@@ -201,6 +202,7 @@ class ServiceOperation(object):
 
         schema = operation.get_schema()
         parameter = schema[OpenAPIKeyWord.PARAMETERS][param_name]
+
         type = parameter[OpenAPIKeyWord.TYPE]
         if type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
             return param_value
