@@ -1,47 +1,79 @@
-VIRTUAL_ENV_LOCATION := ./alcli_env
-VIRTUAL_ENV_ACTIVATE_CMD := $(VIRTUAL_ENV_LOCATION)/bin/activate
+.PHONY: clean clean-build clean-pyc clean-test help
+.DEFAULT_GOAL := help
 
-BASE := $(shell /bin/pwd)
-PYTHON ?= python
-PIP ?= pip
+define BROWSER_PYSCRIPT
+import os, webbrowser, sys
 
-.PHONY: dist install uninstall init
-.DEFAULT_GOAL := dist
+from urllib.request import pathname2url
 
-init:
-	$(info [+] Installing required packages for '$(NAME)'...")
-	@$(PIP) install -r requirements.txt
-	$(info [*] Installed required packages for '$(NAME)'...")
+webbrowser.open("file://" + pathname2url(os.path.abspath(sys.argv[1])))
+endef
+export BROWSER_PYSCRIPT
 
-test:
-	python -m unittest discover -p '*_tests.py' -v -b
+define PRINT_HELP_PYSCRIPT
+import re, sys
 
-lint:
-	pycodestyle .
+for line in sys.stdin:
+    match = re.match(r'^([a-zA-Z_-]+):.*?## (.*)$$', line)
+    if match:
+        target, help = match.groups()
+        print("%-20s %s" % (target, help))
+endef
+export PRINT_HELP_PYSCRIPT
 
-dist:
-	$(info [+] Building distribution for '$(NAME)'...")
-	@$(PYTHON) setup.py -q sdist
-	$(info [+] Build completed.")
+BROWSER := python -c "$$BROWSER_PYSCRIPT"
 
-pypi_upload: dist
-	twine upload --skip-existing dist/alcli-*.*
+help:
+	@python -c "$$PRINT_HELP_PYSCRIPT" < $(MAKEFILE_LIST)
 
-pypi_test_upload: dist
-	twine upload --skip-existing --repository-url https://test.pypi.org/legacy/ dist/alcli-*.*
+clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and Python artifacts
 
-install: virtualenv
-	. $(VIRTUAL_ENV_ACTIVATE_CMD); python setup.py install
-	. $(VIRTUAL_ENV_ACTIVATE_CMD); python setup.py clean --all install clean --all
+clean-build: ## remove build artifacts
+	rm -fr build/
+	rm -fr dist/
+	rm -fr .eggs/
+	find . -name '*.egg-info' -exec rm -fr {} +
+	find . -name '*.egg' -exec rm -f {} +
 
-uninstall:
+clean-pyc: ## remove Python file artifacts
+	find . -name '*.pyc' -exec rm -f {} +
+	find . -name '*.pyo' -exec rm -f {} +
+	find . -name '*~' -exec rm -f {} +
+	find . -name '__pycache__' -exec rm -fr {} +
+
+clean-test: ## remove test and coverage artifacts
+	rm -fr .tox/
+	rm -f .coverage
+	rm -fr htmlcov/
+	rm -fr .pytest_cache
+
+lint: ## check style with flake8
+	flake8 almdrlib tests
+
+test: ## run tests quickly with the default Python
+	python setup.py test
+	
+test-all: ## run tests on every Python version with tox
+	tox
+
+coverage: ## check code coverage quickly with the default Python
+	coverage run --source almdrlib setup.py test
+	coverage report -m
+	coverage html
+	$(BROWSER) htmlcov/index.html
+
+release_test: dist ## package and upload a release to test pypi
+	twine upload --repository-url https://test.pypi.org/legacy/ dist/alcli-*.* dist/*
+
+release: dist ## package and upload a release
+	twine upload --skip-existing dist/alcli-*.* dist/*
+
+dist: clean ## builds source and wheel package
+	python setup.py sdist
+
+install: clean ## install the package to the active Python's site-packages
+	python setup.py install
+
+uninstall:  ## uninstall the package from the active Python's site-packages
 	pip uninstall alcli -y
 
-virtualenv:
-	python3 -m venv $(VIRTUAL_ENV_LOCATION)
-
-virtualenv2:
-	virtualenv $(VIRTUAL_ENV_LOCATION)
-
-virtual_uninstall:
-	rm -rf $(VIRTUAL_ENV_LOCATION)

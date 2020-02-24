@@ -144,7 +144,6 @@ class ALCliOperationHelpFormatter(ALCliHelpFormatter):
         self._name = self._schema[OpenAPIKeyWord.OPERATION_ID]
         self._description = self._schema[OpenAPIKeyWord.DESCRIPTION]
         self._params = self._schema[OpenAPIKeyWord.PARAMETERS]
-            
 
     def make_synopsis(self):
         required = ['\t  ' + self._name]
@@ -163,10 +162,11 @@ class ALCliOperationHelpFormatter(ALCliHelpFormatter):
 
         for name, value in self._schema[OpenAPIKeyWord.PARAMETERS].items():
             type = value.get(OpenAPIKeyWord.TYPE)
+
             if type == OpenAPIKeyWord.OBJECT:
                 type = 'list'
-            elif type in OpenAPIKeyWord.INDIRECT_TYPES:
-                type = 'list'
+            elif type not in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
+                type, alternate_schemas = next(iter(value.items()))
         
             param_specs.append(
                     self.bold(f"\n\t--{name} ") + f"({type})" )
