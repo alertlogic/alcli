@@ -132,7 +132,7 @@ class ALCliServiceHelpFormatter(ALCliHelpFormatter):
     def _make_operations(self, operations):
         ops = [
                 '\to ' + operation_id
-                for operation_id in operations.keys()
+                for operation_id in operations
             ]
         return self.bold("AVAIABLE COMMANDS") + '\n' + '\n\n'.join(ops)
 
