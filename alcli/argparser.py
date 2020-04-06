@@ -1,4 +1,3 @@
-import sys
 import argparse
 from difflib import get_close_matches
 
@@ -14,13 +13,14 @@ USAGE = (
     f"{HELP_MESSAGE}"
 )
 
+
 class CommandAction(argparse.Action):
     def __init__(self, option_strings, dest, command_table, **kwargs):
         self.command_table = command_table
         super(CommandAction, self).__init__(
             option_strings, dest, choices=self.choices, **kwargs
         )
-         
+
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values)
 
@@ -35,7 +35,8 @@ class CommandAction(argparse.Action):
         # generated from the command table keys. So make this a
         # NOOP if argparse.Action tries to set this value.
         pass
-         
+
+
 class CLIArgParser(argparse.ArgumentParser):
     Formatter = argparse.RawTextHelpFormatter
 
@@ -58,9 +59,9 @@ class CLIArgParser(argparse.ArgumentParser):
                     extra.append('  * %s' % word)
                 msg.extend(extra)
             raise argparse.ArgumentError(action, '\n'.join(msg))
-    
+
     def __init__(self, command_table, version_string,
-                    description, argument_table, prog=None):
+                 description, argument_table, prog=None):
         super(CLIArgParser, self).__init__(
             formatter_class=self.Formatter,
             add_help=False,
@@ -71,9 +72,10 @@ class CLIArgParser(argparse.ArgumentParser):
         self._build(command_table, version_string, argument_table)
 
     def parse_known_args(self, args, namespace=None):
-            parsed, remaining = super(CLIArgParser, self).parse_known_args(args, namespace)
-            return parsed, remaining
-        
+        parsed, remaining = super(CLIArgParser, self).parse_known_args(
+                                                            args, namespace)
+        return parsed, remaining
+
     def _build(self, command_table, version_string, argument_table):
         self.add_argument('--version', action="version",
                           version=version_string,
@@ -82,4 +84,3 @@ class CLIArgParser(argparse.ArgumentParser):
                           help="Specify cnfiguration profile name to use")
         self.add_argument('command', action=CommandAction,
                           command_table=command_table)
-

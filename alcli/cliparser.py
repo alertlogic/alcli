@@ -1,4 +1,3 @@
-import sys
 import argparse
 from difflib import get_close_matches
 from almdrlib.client import OpenAPIKeyWord
@@ -15,13 +14,12 @@ USAGE = (
     f"{HELP_MESSAGE}"
 )
 
+
 class CliHelpAction(argparse.Action):
     def __init__(self, option_strings, dest, formatter, **kwargs):
-        print(f"CliHelpAction:__init__ called. option_strings: {option_strings}, dest: {dest}, formatter: {formatter}, kwargs: {kwargs}")
         super().__init__(option_strings, dest, **kwargs)
 
     def __call__(self, parser, namespace, values, option_string=None):
-        print(f"CliHelpAction:__call__ called: Namespace: {namespace}, Values: {values}, Options: {option_string}")
         setattr(namespace, self.dest, values)
 
 
@@ -32,7 +30,7 @@ class CliArgParserBase(argparse.ArgumentParser):
     def _check_value(self, action, value):
         # converted value must be one of the choices (if specified)
         if isinstance(action.choices, dict):
-            choices =  list(action.choices.keys())
+            choices = list(action.choices.keys())
         else:
             choices = action.choices
 
@@ -53,9 +51,10 @@ class CliArgParserBase(argparse.ArgumentParser):
                 msg.extend(extra)
             raise argparse.ArgumentError(action, '\n'.join(msg))
 
+
 class ALCliArgsParser(CliArgParserBase):
     """
-        Main CLI Arguments Parser 
+        Main CLI Arguments Parser
     """
 
     def __init__(self, services, version, description, prog=None):
@@ -82,7 +81,6 @@ class ALCliArgsParser(CliArgParserBase):
 
     def parse_known_args(self, args=None, namespace=None):
         parsed_args, remaining = super().parse_known_args(args, namespace)
-        # print(f"ALCliArgsParser:parse_known_args returning {parsed_args}, {remaining}")
         return parsed_args, remaining
 
     #
@@ -93,19 +91,20 @@ class ALCliArgsParser(CliArgParserBase):
         for name, service in services.items():
             self._subparsers.add_parser(name, service=service)
 
+
 class ServicesArgsParser(CliArgParserBase):
     """
-        Alert Logic Services Parser 
+        Alert Logic Services Parser
     """
 
     def __init__(self, *args, **kwargs):
         self._service = kwargs.pop('service')
         super().__init__(
-                formatter_class = argparse.RawTextHelpFormatter,
+                formatter_class=argparse.RawTextHelpFormatter,
                 add_help=False,
                 conflict_handler='resolve',
                 usage=USAGE)
-        
+
     def parse_known_args(self, args=None, namespace=None):
         #
         # Get Service API Schema
@@ -113,9 +112,10 @@ class ServicesArgsParser(CliArgParserBase):
         if self._service is None:
             return super().parse_known_args(args, namespace)
 
-        service_api = self._service.session.get_service_api(service_name=self._service.name)
+        service_api = self._service.session.get_service_api(
+                                service_name=self._service.name)
 
-        self._required=True
+        self._required = True
         subparsers = self.add_subparsers(
                 dest='operation',
                 title="operation",
@@ -126,13 +126,14 @@ class ServicesArgsParser(CliArgParserBase):
         # Add subparsers for all service operations
         #
         for op_name, op_spec in service_api['operations'].items():
-            operation_parser = subparsers.add_parser(op_name, spec=op_spec)
-        
+            subparsers.add_parser(op_name, spec=op_spec)
+
         #
         # Add help command
         #
         subparsers.add_parser('help', spec=None)
         return super().parse_known_args(args, namespace)
+
 
 class OperationArgsParser(CliArgParserBase):
     """
@@ -141,7 +142,7 @@ class OperationArgsParser(CliArgParserBase):
     def __init__(self, *args, **kwargs):
         self._spec = kwargs.pop('spec')
         super().__init__(
-                formatter_class = argparse.RawTextHelpFormatter,
+                formatter_class=argparse.RawTextHelpFormatter,
                 add_help=False,
                 conflict_handler='resolve',
                 usage=USAGE)
@@ -151,10 +152,9 @@ class OperationArgsParser(CliArgParserBase):
         if 'help' in args:
             self.add_argument('help')
             return super().parse_known_args(args, namespace)
-        elif not self._spec is None:
-            #print(f"SPEC: {self._spec}\n")
+        elif self._spec:
             for key, value in self._spec[OpenAPIKeyWord.PARAMETERS].items():
-                self.add_argument(f"--{key}", required=value.get(OpenAPIKeyWord.REQUIRED))
+                self.add_argument(
+                    f"--{key}", required=value.get(OpenAPIKeyWord.REQUIRED))
 
         return super().parse_known_args(args, namespace)
-
