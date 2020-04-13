@@ -37,8 +37,6 @@ logger = logging.getLogger('alcli.almdr_cli')
 LOG_FORMAT = (
     '%(asctime)s - %(threadName)s - %(name)s - %(levelname)s - %(message)s')
 
-#almdrlib.set_logger('almdrlib.session', logging.DEBUG, format_string=LOG_FORMAT)
-
 GLOBAL_ARGUMENTS = [
         'access_key_id',
         'secret_key',
@@ -48,6 +46,18 @@ GLOBAL_ARGUMENTS = [
         'query',
         'debug'
     ]
+
+def cli_pager(text):
+    """The first time this is called, determine what kind of pager to use."""
+    global cli_pager
+    cli_pager = get_cli_pager()
+    cli_pager(text)
+
+def get_cli_pager():
+    if sys.platform == 'win32':
+        return lambda text: pydoc.pipepager(text, 'more -C')
+    if hasattr(os, 'system') and os.system('(less) 2>/dev/null') == 0:
+        return lambda text: pydoc.pipepager(text, 'less -R')
 
 class AlertLogicCLI(object):
     def __init__(self, session=None):
@@ -66,14 +76,14 @@ class AlertLogicCLI(object):
         
         if parsed_args.service == 'help' or parsed_args.service is None:
             help_formatter = ALCliMainHelpFormatter(services.keys())
-            self._show_help(help_formatter)
+            AlertLogicCLI.show_help(help_formatter)
             return 128
             #sys.stderr.write(f"usage: {USAGE}\n")
             #return 128
 
         if parsed_args.operation == 'help':
             help_formatter = ALCliServiceHelpFormatter(self._services[parsed_args.service])
-            self._show_help(help_formatter)
+            AlertLogicCLI.show_help(help_formatter)
             return 128
 
         if hasattr(parsed_args, 'help') and \
@@ -82,7 +92,7 @@ class AlertLogicCLI(object):
                 parsed_args.help == 'help':
             operation = self._services[parsed_args.service].operations.get(parsed_args.operation)
             help_page = ALCliOperationHelpFormatter(operation)
-            pydoc.pipepager(help_page.format_page() + '\n', 'less -R')
+            cli_pager(help_page.format_page() + '\n')
             return 0
 
 
@@ -121,9 +131,11 @@ class AlertLogicCLI(object):
         parser.add_argument('--debug', dest='debug', default=False, action="store_true")
         return parser
 
-    def _show_help(self, help_formatter):
-        pydoc.pipepager(help_formatter.format_page() + '\n', 'less -R')
+    @staticmethod
+    def show_help(help_formatter):
+        cli_pager(help_formatter.format_page() + '\n')
         return 0
+
 
 class ServiceOperation(object):
     """

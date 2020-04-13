@@ -1,15 +1,27 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import sys
+import os
 import datetime
 import argparse
 import textwrap
 from almdrlib.client import OpenAPIKeyWord
 
 class FormatHelp:
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-    END = '\033[0m'
+    if sys.platform == 'win32':
+        BOLD = ''
+        UNDERLINE = ''
+        END = ''
+    elif hasattr(os, 'system') and os.system('(less) 2>/dev/null') == 0:
+        BOLD = '\033[1m'
+        UNDERLINE = '\033[4m'
+        END = '\033[0m'
+    else:
+        BOLD = ''
+        UNDERLINE = ''
+        END = ''
+
     SECTION_BREAK = '\n'*2
     OPERATION_DESCIPTION_FOOTER = "See 'alcli help' for descriptions of global parameters."
 
