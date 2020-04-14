@@ -55,7 +55,7 @@ def cli_pager(text):
 
 def get_cli_pager():
     if sys.platform == 'win32':
-        return lambda text: pydoc.pipepager(text, 'more -C')
+        return lambda text: pydoc.pipepager(text, 'more /C')
     if hasattr(os, 'system') and os.system('(less) 2>/dev/null') == 0:
         return lambda text: pydoc.pipepager(text, 'less -R')
 
@@ -172,7 +172,10 @@ class ServiceOperation(object):
             # Remove optional arguments that haven't been supplied
             op_args = {k:self._encode(operation, k, v) for (k,v) in kwargs.items() if v is not None}
             res = operation(**op_args)
-            self._print_result(res.json(), parsed_globals.query)
+            try:
+                self._print_result(res.json(), parsed_globals.query)
+            except JSONDecodeError:
+                print(f"status code: {res.status_code}")
 
     @property
     def client(self):
