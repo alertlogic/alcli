@@ -1,4 +1,4 @@
-alertlogic-sdk-python>=1.0.14
+alertlogic-sdk-python>=1.0.15
 jmespath>=0.9.4
 certifi==2019.11.28
 chardet==3.0.4
