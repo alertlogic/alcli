@@ -154,7 +154,7 @@ class OperationArgsParser(CliArgParserBase):
         elif not self._spec is None:
             #print(f"SPEC: {self._spec}\n")
             for key, value in self._spec[OpenAPIKeyWord.PARAMETERS].items():
-                self.add_argument(f"--{key}", required=value.get(OpenAPIKeyWord.REQUIRED))
+                self.add_argument(f"--{key}", nargs='+', required=value.get(OpenAPIKeyWord.REQUIRED))
 
         return super().parse_known_args(args, namespace)
 

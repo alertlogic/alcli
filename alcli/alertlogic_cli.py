@@ -9,6 +9,7 @@ import jmespath
 from json import JSONDecodeError
 import logging
 import argparse
+import re
 import pydoc
 
 from urllib.parse import urlparse
@@ -42,7 +43,7 @@ GLOBAL_ARGUMENTS = [
         'secret_key',
         'profile',
         'residency',
-        'endpoint',
+        'global_endpoint',
         'query',
         'debug'
     ]
@@ -78,8 +79,6 @@ class AlertLogicCLI(object):
             help_formatter = ALCliMainHelpFormatter(services.keys())
             AlertLogicCLI.show_help(help_formatter)
             return 128
-            #sys.stderr.write(f"usage: {USAGE}\n")
-            #return 128
 
         if parsed_args.operation == 'help':
             help_formatter = ALCliServiceHelpFormatter(self._services[parsed_args.service])
@@ -95,12 +94,18 @@ class AlertLogicCLI(object):
             cli_pager(help_page.format_page() + '\n')
             return 0
 
-
-        return services[parsed_args.service](remaining, parsed_args)
         try:
             return services[parsed_args.service](remaining, parsed_args)
+        except almdrlib.exceptions.AlmdrlibValueError as e:
+            sys.stderr.write(f"{e}\n")
+            return 255
+        except almdrlib.session.AuthenticationException as e:
+            sys.stderr.write("Access Denied\n")
+            return 255
         except Exception as e:
-            sys.stderr.write(f"Caught exception in main(). Error: {str(e)}\n")
+            template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+            message = template.format(type(e).__name__, e.args)
+            logger.exception(message)
             return 255
 
     def _get_services(self):
@@ -126,7 +131,7 @@ class AlertLogicCLI(object):
         parser.add_argument('--secret_key', dest='secret_key', default=None)
         parser.add_argument('--profile', dest='profile', default=None)
         parser.add_argument('--residency', dest='residency', default=None, choices=Residency.list_residencies())
-        parser.add_argument('--endpoint', dest='global_endpoint', default=None, choices=Region.list_endpoints())
+        parser.add_argument('--global_endpoint', dest='global_endpoint', default=None, choices=Region.list_endpoints())
         parser.add_argument('--query', dest='query', default=None)
         parser.add_argument('--debug', dest='debug', default=False, action="store_true")
         return parser
@@ -203,7 +208,13 @@ class ServiceOperation(object):
     def _init_service(self, parsed_globals):
         return self._session.client(
                 self._name,
-                profile=parsed_globals.profile)
+                access_key_id=parsed_globals.access_key_id,
+                secret_key=parsed_globals.secret_key,
+                profile=parsed_globals.profile,
+                global_endpoint=parsed_globals.global_endpoint,
+                residency=\
+                        parsed_globals.residency and \
+                        parsed_globals.residency or "us")
 
     def _encode(self, operation, param_name, param_value):
         p = urlparse(param_value)
@@ -227,13 +238,14 @@ class ServiceOperation(object):
                 # this could be an argument encoded using a short form such as
                 # key1=value,key2=value2
                 #
+                regex = re.compile(
+                        '(?P<pair>(?P<key>.+?)(?:=)(?P<value>[^=]+)(?:,|$))')
                 result = dict(
-                        (k.strip(), v.strip())
-                        for k, v in (kv.split('=')
-                        for kv in param_value.split(','))
-                    )
+                    (m.groupdict()['key'], m.groupdict()['value'])
+                    for m in regex.finditer(param_value)
+                )
                 return result
-        
+
         # TODO Raise an exception if we can't build a dictionary from the provided input
         return param_value
 
