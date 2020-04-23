@@ -217,11 +217,12 @@ class ServiceOperation(object):
                         parsed_globals.residency or "us")
 
     def _encode(self, operation, param_name, param_value):
-        p = urlparse(param_value)
-        if p.scheme == "file":
-            value_file_path = os.path.abspath(os.path.join(p.netloc, p.path))
-            with open (value_file_path, "r") as value_file:
-                param_value = value_file.read()
+        if isinstance(param_value, str):
+            p = urlparse(param_value)
+            if p.scheme == "file":
+                value_file_path = os.path.abspath(os.path.join(p.netloc, p.path))
+                with open (value_file_path, "r") as value_file:
+                    param_value = value_file.read()
 
         schema = operation.get_schema()
         parameter = schema[OpenAPIKeyWord.PARAMETERS][param_name]
