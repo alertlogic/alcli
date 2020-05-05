@@ -76,22 +76,30 @@ class AlertLogicCLI(object):
         logger.debug(f"Parsed Arguments: {parsed_args}, Remaining: {remaining}")
         
         if parsed_args.service == 'help' or parsed_args.service is None:
-            help_formatter = ALCliMainHelpFormatter(services.keys())
-            AlertLogicCLI.show_help(help_formatter)
+            AlertLogicCLI.show_help(
+                     ALCliMainHelpFormatter(Session.list_services())
+                )
             return 128
 
         if parsed_args.operation == 'help':
-            help_formatter = ALCliServiceHelpFormatter(self._services[parsed_args.service])
-            AlertLogicCLI.show_help(help_formatter)
+            AlertLogicCLI.show_help(
+                    ALCliServiceHelpFormatter(
+                        parsed_args.service,
+                        Session.get_service_api(parsed_args.service)
+                    )
+                )
             return 128
 
         if hasattr(parsed_args, 'help') and \
                 hasattr(parsed_args, 'service') and \
                 hasattr(parsed_args, 'operation') and \
                 parsed_args.help == 'help':
-            operation = self._services[parsed_args.service].operations.get(parsed_args.operation)
-            help_page = ALCliOperationHelpFormatter(operation)
-            cli_pager(help_page.format_page() + '\n')
+            spec = Session.get_service_api(parsed_args.service)['operations']
+            AlertLogicCLI.show_help(
+                    ALCliOperationHelpFormatter(
+                        spec.get(parsed_args.operation, {})
+                    )
+                )
             return 0
 
         try:
@@ -137,8 +145,9 @@ class AlertLogicCLI(object):
         return parser
 
     @staticmethod
-    def show_help(help_formatter):
-        cli_pager(help_formatter.format_page() + '\n')
+    def show_help(help_generator):
+        # cli_pager(help_formatter.format_page() + '\n')
+        cli_pager('\n'.join(list(help_generator.get_help())) + '\n')
         return 0
 
 
@@ -177,7 +186,10 @@ class ServiceOperation(object):
             # Remove optional arguments that haven't been supplied
             op_args = {k:self._encode(operation, k, v) for (k,v) in kwargs.items() if v is not None}
             res = operation(**op_args)
-            self._print_result(res.json(), parsed_globals.query)
+            try:
+                self._print_result(res.json(), parsed_globals.query)
+            except json.decoder.JSONDecodeError:
+                print(f'HTTP Status Code: {res.status_code}')
 
     @property
     def client(self):
