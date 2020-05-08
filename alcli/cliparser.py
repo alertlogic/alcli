@@ -113,7 +113,7 @@ class ServicesArgsParser(CliArgParserBase):
         if self._service is None:
             return super().parse_known_args(args, namespace)
 
-        service_api = self._service.session.get_service_api(service_name=self._service.name)
+        service_api = self._service.get_service_api(self._service.name)
 
         self._required=True
         subparsers = self.add_subparsers(

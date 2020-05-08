@@ -61,8 +61,7 @@ def get_cli_pager():
         return lambda text: pydoc.pipepager(text, 'less -R')
 
 class AlertLogicCLI(object):
-    def __init__(self, session=None):
-        self._session = session or Session()
+    def __init__(self):
         self._subparsers = None
         self._services = None
         self._arguments = None
@@ -121,7 +120,7 @@ class AlertLogicCLI(object):
             self._services = OrderedDict()
             services_list = Session.list_services()
             self._services = {
-                service_name: ServiceOperation(name=service_name, session=self._session)
+                service_name: ServiceOperation(name=service_name)
                 for service_name in services_list
             }
 
@@ -156,9 +155,8 @@ class ServiceOperation(object):
         A service operation. For example: alcli aetuner would create
         a ServiceOperation object for aetuner service
     """
-    def __init__(self, name, session):
+    def __init__(self, name):
         self._name = name
-        self._session = session
         self._client= None
         #self._service = None
         self._description = None
@@ -191,6 +189,9 @@ class ServiceOperation(object):
             except json.decoder.JSONDecodeError:
                 print(f'HTTP Status Code: {res.status_code}')
 
+    def get_service_api(self, service_name):
+        return Session.get_service_api(service_name=service_name)
+
     @property
     def client(self):
         if self._client is None:
@@ -200,10 +201,6 @@ class ServiceOperation(object):
     @property
     def name(self):
         return self._name
-
-    @property
-    def session(self):
-        return self._session
 
     @property
     def description(self):
@@ -218,15 +215,17 @@ class ServiceOperation(object):
         return self._operations
 
     def _init_service(self, parsed_globals):
-        return self._session.client(
+        return almdrlib.client(
                 self._name,
                 access_key_id=parsed_globals.access_key_id,
                 secret_key=parsed_globals.secret_key,
+                account_id=parsed_globals.account_id,
                 profile=parsed_globals.profile,
                 global_endpoint=parsed_globals.global_endpoint,
                 residency=\
                         parsed_globals.residency and \
-                        parsed_globals.residency or "us")
+                        parsed_globals.residency or "default"
+        )
 
     def _encode(self, operation, param_name, param_value):
         if isinstance(param_value, str):
@@ -275,8 +274,7 @@ def main():
     else:
         logging.basicConfig(level=logging.WARNING)
 
-    session = Session()
-    cli= AlertLogicCLI(session=session)
+    cli= AlertLogicCLI()
     cli.main()
 
 if __name__ == "__main__":
