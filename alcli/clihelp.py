@@ -256,7 +256,7 @@ class ALCliOperationHelpFormatter(ALCliHelpFormatter):
         self._required_params = dict()
         self._params = dict()
         for key, value in spec.get('parameters', {}).items():
-            if 'required' in value:
+            if 'required' in value or 'x-alertlogic-required' in value:
                 self._required_params[key] = value
             else:
                 self._params[key] = value
