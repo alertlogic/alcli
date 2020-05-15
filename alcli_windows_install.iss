@@ -40,8 +40,9 @@ Name: "envPath"; Description: "Add to PATH variable"
 
 [Files]
 Source: "build\exe.win-amd64-3.7\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\exe.win-amd64-3.7\lib\*"; DestDir: "{app}\Lib"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "build\exe.win-amd64-3.7\lib\*"; DestDir: "{app}\Lib"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "build\exe.win-amd64-3.7\lib\VCRUNTIME140.dll"
 Source: "build\exe.win-amd64-3.7\python37.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\exe.win-amd64-3.7\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
