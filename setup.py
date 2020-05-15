@@ -4,7 +4,6 @@ import sys
 from os import path
 from setuptools import setup, find_packages
 from cx_Freeze import setup, Executable
-import importlib_metadata
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
