@@ -19,12 +19,10 @@ phases:
   install:
     commands:
         - >-
-          # Install Visual Studio runtime
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12; 
           Invoke-WebRequest -UseBasicParsing https://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe -OutFile vcredist_x86.exe;
           Start-Process vcredist_x86.exe -ArgumentList '/q', '/passive', '/norestart' -NoNewWindow -Wait;
         - >-
-          # Install Inno setup
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12; 
           Invoke-WebRequest -UseBasicParsing https://jrsoftware.org/download.php/is.exe?site=1 -OutFile is.exe;
           Start-Process is.exe -ArgumentList '/VERYSILENT', '/ALLUSERS', '/DIR=c:\innosetup' -NoNewWindow -Wait
@@ -33,7 +31,6 @@ phases:
     commands:
       - c:\Python38\Scripts\pip.exe install -r requirements.txt
       - >-
-        # Place the real version of jsonschema  b/c dynamic importing doesn't work on Windows
         (Get-Content C:\Python38\Lib\site-packages\jsonschema\__init__.py) | ForEach-Object { $_ -replace "__version__.+" , "__version__ = '3.2.0'" } | Set-Content C:\Python38\Lib\site-packages\jsonschema\__init__.py
         
   build:
