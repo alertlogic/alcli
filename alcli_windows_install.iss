@@ -21,8 +21,8 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 SetupIconFile="icons/alertlogic-win.ico"
-WizardImageFile="icons/alertlogic.bmp"
-WizardSmallImageFile="icons/alertlogic.bmp"
+WizardImageFile="icons/alertlogic-138x140.bmp"
+WizardSmallImageFile="icons/alertlogic-138x140.bmp"
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
@@ -33,6 +33,7 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 ChangesEnvironment=true
+SignedUninstaller=true
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
