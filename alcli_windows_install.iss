@@ -20,6 +20,9 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+SetupIconFile="icons/alertlogic-win.ico"
+WizardImageFile="icons/alertlogic.bmp"
+WizardSmallImageFile="icons/alertlogic.bmp"
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
@@ -39,10 +42,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "envPath"; Description: "Add to PATH variable" 
 
 [Files]
-Source: "build\exe.win-amd64-3.8\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\exe.win-amd64-3.8\lib\*"; DestDir: "{app}\Lib"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"
-Source: "build\exe.win-amd64-3.8\python38.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\exe.win-amd64-3.7\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\exe.win-amd64-3.7\lib\*"; DestDir: "{app}\Lib"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"
+Source: "build\exe.win-amd64-3.7\python37.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "build\exe.win-amd64-3.7\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
