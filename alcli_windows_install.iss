@@ -33,6 +33,7 @@ Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
 ChangesEnvironment=true
+SignTool=signtool
 SignedUninstaller=true
 
 [Languages]
