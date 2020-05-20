@@ -2,6 +2,14 @@
 const GlobalEnvironmentKey = 'SYSTEM\CurrentControlSet\Control\Session Manager\Environment';
 const UserEnvironmentKey = 'Environment';
 
+function EndsWith(SubText, Text: string): Boolean;
+var
+  EndStr: string;
+begin
+  EndStr := Copy(Text, Length(Text) - Length(SubText) + 1, Length(SubText));
+  Result := SameText(SubText, EndStr);
+end;
+
 procedure EnvAddPath(Path: string);
 var
     Paths: string;
@@ -24,7 +32,9 @@ begin
     if Pos(';' + Uppercase(Path) + ';', ';' + Uppercase(Paths) + ';') > 0 then exit;
 
     { App string to the end of the path variable }
-    Paths := Paths + ';'+ Path +';'
+    if EndsWith(';', Paths)
+    then Paths := Paths + Path +';' 
+    else Paths := Paths + ';'+ Path +';';
 
     { Overwrite (or create if missing) path environment variable }
     if RegWriteStringValue(RootKey, EnvironmentKey, 'Path', Paths)

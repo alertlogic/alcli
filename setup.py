@@ -78,7 +78,8 @@ setup(
     executables = [Executable(
             script='alcli/alertlogic_cli.py',
             targetName='alcli',
-            base=base
+            base=base,
+            icon='icons/alertlogic-win.ico'
             )
         ],
     keywords=['alcli', 'almdr', 'alertlogic', 'alertlogic-cli']
