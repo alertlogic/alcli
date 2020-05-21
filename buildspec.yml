@@ -27,6 +27,10 @@ phases:
           [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12;
           Invoke-WebRequest -UseBasicParsing https://jrsoftware.org/download.php/is.exe?site=1 -OutFile is.exe;
           Start-Process is.exe -ArgumentList '/VERYSILENT', '/ALLUSERS', '/DIR=c:\innosetup' -NoNewWindow -Wait
+        - >-
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12;
+          Invoke-WebRequest -UseBasicParsing https://softpedia-secure-download.com/dl/13029c53aedc37be6edf95b1f7e9693c/5ec68165/100237454/software/programming/verpatch-1.0.15.1-x86-codeplex.zip -OutFile verpatch-1.0.15.1-x86-codeplex.zip;
+          expand-archive -path 'verpatch-1.0.15.1-x86-codeplex.zip' -destinationpath '.\verpatch-1.0.15.1-x86-codeplex'
 
   pre_build:
     commands:
@@ -38,6 +42,7 @@ phases:
   build:
     commands:
       - c:\Python37\python.exe setup.py bdist_msi
+      - Start-Process '.\verpatch-1.0.15.1-x86-codeplex\verpatch.exe' -ArgumentList '.\build\exe.win-amd64-3.7\alcli.exe', '1.0.20.0', '/va', '/pv "1.0.20"', '/langid 1033', '/s desc "Alert Logic CLI"', '/s copyright "Copyright (c) 2020, Alert Logic, Inc."', '/s product "Alert Logic CLI"'
       - >-
         Get-ChildItem build\exe.win-amd64-3.7\ -Filter test -Recurse -Force | Remove-Item -Recurse -Force
       - >-
