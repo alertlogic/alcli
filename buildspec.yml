@@ -1,0 +1,90 @@
+version: 0.2
+
+env:
+  #variables:
+     # key: "value"
+     # key: "value"
+  #parameter-store:
+     # key: "value"
+     # key: "value"
+  secrets-manager:
+     cert: prod/windows_sign_cert_info:cert
+     pwd: prod/windows_sign_cert_info:pwd
+
+  #exported-variables:
+     # - variable
+     # - variable
+  #git-credential-helper: yes
+
+phases:
+  install:
+    commands:
+        - >-
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12;
+          Invoke-WebRequest -UseBasicParsing https://download.microsoft.com/download/1/1/1/1116b75a-9ec3-481a-a3c8-1777b5381140/vcredist_x86.exe -OutFile vcredist_x86.exe;
+          Start-Process vcredist_x86.exe -ArgumentList '/q', '/passive', '/norestart' -NoNewWindow -Wait
+        - >-
+          [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12;
+          Invoke-WebRequest -UseBasicParsing https://jrsoftware.org/download.php/is.exe?site=1 -OutFile is.exe;
+          Start-Process is.exe -ArgumentList '/VERYSILENT', '/ALLUSERS', '/DIR=c:\innosetup' -NoNewWindow -Wait
+        - >-
+          aws s3 cp s3://alertlogic-public-repo.us-east-1/alcli-win-install/thirdparty/verpatch-1.0.15.1-x86-codeplex.zip verpatch-1.0.15.1-x86-codeplex.zip;
+          expand-archive -path 'verpatch-1.0.15.1-x86-codeplex.zip' -destinationpath '.\verpatch-1.0.15.1-x86-codeplex'
+
+  pre_build:
+    commands:
+      - mkdir c:\tmp
+      - c:\Python37\Scripts\pip.exe install -r requirements.txt
+      - >-
+        (Get-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py) | ForEach-Object { $_ -replace "try.+" , "" } | Set-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py;
+        (Get-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py) | ForEach-Object { $_ -replace "from importlib import.+" , "" } | Set-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py;
+        (Get-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py) | ForEach-Object { $_ -replace "except ImportError.+" , "" } | Set-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py;
+        (Get-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py) | ForEach-Object { $_ -replace "import importlib_metadata.+" , "" } | Set-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py;
+        (Get-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py) | ForEach-Object { $_ -replace "__version__.+" , "__version__ = '3.2.0'" } | Set-Content C:\Python37\Lib\site-packages\jsonschema\__init__.py
+
+  build:
+    commands:
+      - c:\Python37\python.exe setup.py bdist_msi
+      - >-
+        $version_string = Get-Content alcli\__init__.py | Select -Index 0;
+        $version_string -match "__version__ = '(?<version>.*)'";
+        $version = $matches['version'] + '.0';
+        $product_version = '/pv ' + $version;
+        Start-Process '.\verpatch-1.0.15.1-x86-codeplex\verpatch.exe' -ArgumentList '.\build\exe.win-amd64-3.7\alcli.exe', $version, '/va', $product_version, '/langid 1033', '/s desc "Alert Logic CLI"', '/s copyright "Copyright (C) 2020, Alert Logic, Inc."', '/s product "Alert Logic CLI"'
+      - >-
+        Get-ChildItem build\exe.win-amd64-3.7\ -Filter test -Recurse -Force | Remove-Item -Recurse -Force
+      - >-
+        $decoded = [System.Convert]::FromBase64CharArray($Env:cert, 0, $Env:cert.Length);
+        $decoded | Set-Content c:\tmp\cert.p12 -Encoding Byte;
+        New-Item -Path HKCU:\Software -Name "Jordan Russell";
+        New-Item -Path "HKCU:\Software\Jordan Russell" -Name "Inno Setup";
+        New-Item -Path "HKCU:\Software\Jordan Russell\Inno Setup" -Name "SignTools";
+        $registryPath = "HKCU:\Software\Jordan Russell\Inno Setup\SignTools";
+        $name = "SignTool0";
+        $value = "signtool=signtool.exe sign /t http://timestamp.verisign.com/scripts/timstamp.dll /f c:\tmp\cert.p12 /p $Env:pwd `$f";
+        New-ItemProperty -Path $registryPath -Name $name -Value $value;
+        signtool.exe sign /a /t  http://timestamp.verisign.com/scripts/timstamp.dll /f c:\tmp\cert.p12 /p $Env:pwd /v build\exe.win-amd64-3.7\alcli.exe;
+        c:\innosetup\iscc.exe /Odist alcli_windows_install.iss /S"mytool=signtool.exe sign /t  http://timestamp.verisign.com/scripts/timstamp.dll /f c:\tmp\cert.p12 /p $Env:pwd $f"
+
+  #post_build:
+    #commands:
+      # - command
+      # - command
+#reports:
+  #report-name-or-arn:
+    #files:
+      # - location
+      # - location
+    #base-directory: location
+    #discard-paths: yes
+    #file-format: JunitXml | CucumberJson
+artifacts:
+  files:
+    - dist\alcli_setup.exe
+    # - location
+  #name: $(date +%Y-%m-%d)
+  #discard-paths: yes
+  #base-directory: location
+#cache:
+  #paths:
+    # - paths

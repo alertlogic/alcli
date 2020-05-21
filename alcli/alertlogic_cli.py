@@ -32,7 +32,15 @@ from alcli.clihelp import ALCliServiceHelpFormatter
 from alcli.clihelp import ALCliOperationHelpFormatter
 from alcli import __version__ as alcli_version
 
-sys.path.insert(0, os.path.dirname(__file__))
+if getattr(sys, 'frozen', False):
+    # frozen
+    dir_ = os.path.dirname(sys.executable)
+else:
+    # unfrozen
+    dir_ = os.path.dirname(os.path.dirname(__file__))
+
+sys.path.insert(0, dir_)
+# sys.path.insert(0, os.path.dirname(__file__))
 
 logger = logging.getLogger('alcli.almdr_cli')
 LOG_FORMAT = (
