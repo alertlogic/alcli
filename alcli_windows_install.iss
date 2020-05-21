@@ -3,7 +3,8 @@
 
 #include "environment.iss"
 
-#define MyAppName "alcli"
+#define MyAppDirectory "alcli"
+#define MyAppName "Alert Logic CLI"
 #define MyAppVersion "1.0.20"
 #define MyAppPublisher "Alert Logic, Inc."
 #define MyAppURL "https://github.com/alertlogic/alcli"
@@ -21,13 +22,16 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 SetupIconFile="icons/alertlogic-win.ico"
-WizardImageFile="icons/alertlogic-138x140.bmp"
-WizardSmallImageFile="icons/alertlogic-138x140.bmp"
-DefaultDirName={autopf}\{#MyAppName}
+WizardImageFile="icons/alertlogic-modern-image.bmp"
+WizardSmallImageFile="icons/alertlogic-modern-small-image.bmp"
+DefaultDirName={autopf}\{#MyAppDirectory}
+DisableWelcomePage=no
+DisableReadyPage=yes
 DisableProgramGroupPage=yes
+LicenseFile=LICENSE
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
-PrivilegesRequired=lowest
-PrivilegesRequiredOverridesAllowed=dialog
+PrivilegesRequired=admin
+PrivilegesRequiredOverridesAllowed=commandline
 OutputBaseFilename=alcli_setup
 Compression=lzma
 SolidCompression=yes
@@ -35,6 +39,7 @@ WizardStyle=modern
 ChangesEnvironment=true
 SignTool=signtool $f
 SignedUninstaller=true
+UninstallDisplayIcon={app}\alcli.exe
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -45,14 +50,14 @@ Name: "envPath"; Description: "Add to PATH variable"
 
 [Files]
 Source: "build\exe.win-amd64-3.7\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "build\exe.win-amd64-3.7\lib\*"; DestDir: "{app}\Lib"; Flags: ignoreversion recursesubdirs createallsubdirs; Excludes: "build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"
+Source: "build\exe.win-amd64-3.7\lib\*"; DestDir: "{app}\Lib"; Excludes: "build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll,build\exe.win-amd64-3.8\lib\test\*,build\exe.win-amd64-3.8\lib\*\test\*"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "build\exe.win-amd64-3.7\python37.dll"; DestDir: "{app}"; Flags: ignoreversion
 Source: "build\exe.win-amd64-3.7\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
 Name: "{autoprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
-; Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+; Name: "{commonprograms}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"
 
 [Run]
 ; Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait skipifsilent
