@@ -3,9 +3,9 @@
 
 #include "environment.iss"
 
-#define MyAppDirectory "alcli"
+#define MyAppDirectory "Alert Logic\alcli"
 #define MyAppName "Alert Logic CLI"
-#define MyAppVersion "1.0.20"
+#define MyAppVersion GetFileVersion("build\exe.win-amd64-3.7\alcli.exe")
 #define MyAppPublisher "Alert Logic, Inc."
 #define MyAppURL "https://github.com/alertlogic/alcli"
 #define MyAppExeName "alcli.exe"
