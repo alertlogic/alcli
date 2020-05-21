@@ -21,6 +21,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
+AppCopyright=Copyright (C) 2020 Alert Logic, Inc.
 SetupIconFile="icons/alertlogic-win.ico"
 WizardImageFile="icons/alertlogic-modern-image.bmp"
 WizardSmallImageFile="icons/alertlogic-modern-small-image.bmp"
