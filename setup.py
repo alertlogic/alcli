@@ -5,6 +5,7 @@ from os import path
 from setuptools import setup, find_packages
 if sys.platform == 'win32':
     from cx_Freeze import setup, Executable
+    base = None
     executables = [Executable(
             script='alcli/alertlogic_cli.py',
             targetName='alcli',
@@ -27,9 +28,6 @@ with open('README.md') as readme_file:
 
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
-
-# base = 'Console' if sys.platform=='win32' else None
-base = None
 
 requirements = [
         'alertlogic-sdk-python==1.0.26',
