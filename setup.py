@@ -21,7 +21,7 @@ with open('HISTORY.rst') as history_file:
 base = None
 
 requirements = [
-        'alertlogic-sdk-python>=1.0.23',
+        'alertlogic-sdk-python>=1.0.24',
         'configparser>=4.0.2',
         'pyyaml==5.1.2',
         'jmespath>=0.9.4',
