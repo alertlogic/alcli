@@ -1,5 +1,5 @@
-alertlogic-sdk-python>=1.0.24
-jmespath>=0.9.4
+alertlogic-sdk-python==1.0.26
+jmespath==0.9.4
 certifi==2019.11.28
 chardet==3.0.4
 configparser==4.0.2
@@ -7,4 +7,4 @@ idna==2.8
 PyYAML==5.1.2
 requests==2.22.0
 urllib3==1.25.8
-cx_freeze==6.1
+cx_Freeze==6.1

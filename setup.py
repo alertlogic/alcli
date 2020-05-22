@@ -3,7 +3,18 @@ import ast
 import sys
 from os import path
 from setuptools import setup, find_packages
-from cx_freeze import setup, Executable
+if sys.platform == 'win32':
+    from cx_Freeze import setup, Executable
+    executables = [Executable(
+            script='alcli/alertlogic_cli.py',
+            targetName='alcli',
+            base=base,
+            icon='icons/alertlogic-win.ico'
+            )
+        ]
+else:
+    executables = []
+
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 
@@ -21,10 +32,10 @@ with open('HISTORY.rst') as history_file:
 base = None
 
 requirements = [
-        'alertlogic-sdk-python>=1.0.24',
-        'configparser>=4.0.2',
+        'alertlogic-sdk-python==1.0.26',
+        'configparser==4.0.2',
         'pyyaml==5.1.2',
-        'jmespath>=0.9.4',
+        'jmespath==0.9.4',
         'importlib_metadata==1.6.0'
     ]
 setup(
@@ -75,12 +86,6 @@ setup(
             'add_to_path': False
         }
     },
-    executables = [Executable(
-            script='alcli/alertlogic_cli.py',
-            targetName='alcli',
-            base=base,
-            icon='icons/alertlogic-win.ico'
-            )
-        ],
+    executables = executables,
     keywords=['alcli', 'almdr', 'alertlogic', 'alertlogic-cli']
 )
