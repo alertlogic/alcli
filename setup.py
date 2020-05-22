@@ -3,7 +3,7 @@ import ast
 import sys
 from os import path
 from setuptools import setup, find_packages
-from cx_Freeze import setup, Executable
+from cx_freeze import setup, Executable
 
 _version_re = re.compile(r'__version__\s+=\s+(.*)')
 

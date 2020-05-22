@@ -1,2 +1,2 @@
-__version__ = '1.0.22'
+__version__ = '1.0.23'
 __author__ = 'Alert Logic, Inc.'
