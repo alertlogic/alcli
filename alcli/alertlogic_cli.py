@@ -223,11 +223,15 @@ class ServiceOperation(object):
         return self._operations
 
     def _init_service(self, parsed_globals):
+        account_id = None
+        if hasattr(parsed_globals, 'account_id'):
+            account_id = parsed_globals.account_id
+
         return almdrlib.client(
                 self._name,
                 access_key_id=parsed_globals.access_key_id,
                 secret_key=parsed_globals.secret_key,
-                account_id=parsed_globals.account_id,
+                account_id=account_id,
                 profile=parsed_globals.profile,
                 global_endpoint=parsed_globals.global_endpoint,
                 residency=\
@@ -280,7 +284,7 @@ def main():
         print("Running in DEBUG mode")
         logging.basicConfig(level=logging.DEBUG)
     else:
-        logging.basicConfig(level=logging.WARNING)
+        logging.basicConfig(level=logging.ERROR)
 
     cli= AlertLogicCLI()
     cli.main()
