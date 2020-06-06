@@ -1,7 +1,9 @@
 import re
 import ast
 import sys
-from os import path
+from urllib import request
+import json
+
 from setuptools import setup, find_packages
 if sys.platform == 'win32':
     from cx_Freeze import setup, Executable
@@ -16,21 +18,24 @@ if sys.platform == 'win32':
 else:
     executables = []
 
-
-_version_re = re.compile(r'__version__\s+=\s+(.*)')
-
-with open('alcli/__init__.py', 'rb') as f:
-    version = str(ast.literal_eval(_version_re.search(
-        f.read().decode('utf-8')).group(1)))
-
 with open('README.md') as readme_file:
     readme = readme_file.read()
 
 with open('HISTORY.rst') as history_file:
     history = history_file.read()
 
+try:
+    # This is to force definitions to be upgraded every build not related to the definitions change
+    sdk_pypi_url = "https://pypi.org/pypi/alertlogic-sdk-python/json"
+    with request.urlopen(sdk_pypi_url) as defs_rq:
+        defs_info = json.loads(defs_rq.read())
+    sdk_latest_version = defs_info['info']['version']
+    sdk_dependency = 'alertlogic-sdk-python>=' + sdk_latest_version
+except:
+    sdk_dependency = 'alertlogic-sdk-python>=1.0.26'
+
 requirements = [
-        'alertlogic-sdk-python==1.0.27',
+        sdk_dependency,
         'configparser==4.0.2',
         'pyyaml==5.1.2',
         'jmespath==0.9.4',
@@ -38,7 +43,8 @@ requirements = [
     ]
 setup(
     name='alcli',
-    version=version,
+    use_scm_version=True,
+    setup_requires=['setuptools_scm'],
     url='https://github.com/alertlogic/alcli',
     license='MIT license',
     author='Alert Logic Inc.',

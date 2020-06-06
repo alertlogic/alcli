@@ -1,0 +1,26 @@
+language: python
+env:
+  matrix:
+    - GITHUB_REPO=alertlogic/alcli
+jobs:
+  include:
+    - stage: build
+      python: 3.8
+      install: pip install -U tox-travis
+      script: tox
+      deploy:
+        provider: pypi
+        distributions: sdist bdist_wheel
+        cleanup: false
+        user: __token__
+        password:
+          secure: m+LGl/JxMa5Fg4rs9RfroHEXW79GrK8pPNtXvvn61ngX9Sesn0QhK/ZmU47v8L6qLL4US12SEoM+QpJw4vNbcKtM2XnutDm/LDWAEPq5449sPv15esz5vajRjYfb7Ne8ccNVQ4CbQWnEbt/Xn9hX2g/QTXz3LlpSB7iNgjXjWNHY0evzbZVAFB3q3JAc6wHgqKjaflzPo07uzKQrxQLBefNCORbtFNKd+H2gXVQTh6hdLBJii8j/o8kCAXO+8N//SmRw2cnA4EJqD+dAxzjuSifoWWmhx6yMgRPB/HbXMaroE0E/wJoMj+XueLGbZ6KaY5wFAx9oXoQfISSAQpcQ0ggRgwS8FWLz/Eq6S0InPQ/dUsWzLnSnT1VjFHAlbVD9+aNNnNVhoXQofWks1bAekJZZw5Age6HXvP3F/HcUs5PBL6yMYZle8FezZwBV7vapc2DRdugmmq4nj4bvdCIlKfsYnT2xY3plmil5hDn3Bsitfoe4Il5LHXn7jZhwyinFslaDYoErHTs7k569BFP4ZdD678MFNAEIkgmh17Pnt4bqr9RMS8XseJ9vCYX8FkMVuV0/O/AlSQsyBgDNpfgx4rEhRv49njb22XUL7stskBAJmhbYvSYat6Y0LEQf1tvAlngDzKe2htYdysRvKKzGsOG6WECF1Xw6zWuuikKgmwQ=
+        on:
+          tags: true
+          repo: "$GITHUB_REPO"
+          python: 3.8
+    - python: 3.7
+      install: pip install -U tox-travis
+      script: tox
+    - stage: windows_build
+      os: windows

@@ -23,14 +23,14 @@ from almdrlib.client import Client
 from almdrlib.client import OpenAPIKeyWord
 from almdrlib.region import Region
 from almdrlib.region import Residency
-from almdrlib import __version__ as almdrlib_version
+from almdrlib.version import version as almdrlib_version
 
 from alcli.cliparser import ALCliArgsParser
 from alcli.cliparser import USAGE
 from alcli.clihelp import ALCliMainHelpFormatter
 from alcli.clihelp import ALCliServiceHelpFormatter
 from alcli.clihelp import ALCliOperationHelpFormatter
-from alcli import __version__ as alcli_version
+from alcli.version import version as alcli_version
 
 if getattr(sys, 'frozen', False):
     # frozen
