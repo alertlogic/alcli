@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/alertlogic/alcli.svg?branch=master)](https://travis-ci.com/alertlogic/alcli)
+[![PyPI version](https://badge.fury.io/py/alcli.svg)](https://badge.fury.io/py/alcli)
+
 # Installing the Alert Logic CLI
 The `pip` package manager for Python is used to install, upgrade and remove Alert Logic CLI.
 
