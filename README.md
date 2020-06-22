@@ -19,7 +19,7 @@ Make sure to use `--user` to to install the program to a subdirectory of your us
 
 ### Windows installer
 
-For windows users there is sel-contained Alert Logic CLI distribution is available, please download latest version from [here](http://github.com/alertlogic/alcli/releases/latest/download/alcli_setup.exe)
+For windows users there is self-contained Alert Logic CLI distribution is available, please download latest version from [here](http://github.com/alertlogic/alcli/releases/latest/download/alcli_setup.exe)
 
 Alternatively, please view [history](https://github.com/alertlogic/alcli/releases/) of the releases. 
 
