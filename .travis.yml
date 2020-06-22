@@ -2,12 +2,13 @@ language: python
 env:
   matrix:
   - GITHUB_REPO=alertlogic/alcli
-addons:
-  artifacts:
-    s3_region: "us-west-1"
-    paths:
-      - dist/
-      - build/exe.win-amd64-3.8/alcli.exe
+# artifacts upload to private s3 bucket for debugging
+#addons:
+#  artifacts:
+#    s3_region: "us-west-1"
+#    paths:
+#      - dist/
+#      - build/exe.win-amd64-3.8/alcli.exe
 jobs:
   include:
   - stage: build

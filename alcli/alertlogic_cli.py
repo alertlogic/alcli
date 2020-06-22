@@ -32,6 +32,8 @@ from alcli.clihelp import ALCliServiceHelpFormatter
 from alcli.clihelp import ALCliOperationHelpFormatter
 from alcli.version import version as alcli_version
 
+from alsdkdefs.version import version as alsdkdefs_version
+
 if getattr(sys, 'frozen', False):
     # frozen
     dir_ = os.path.dirname(sys.executable)
@@ -137,7 +139,9 @@ class AlertLogicCLI(object):
     def _create_parser(self, services):
         parser = ALCliArgsParser(
                 services,
-                f"alcli/{alcli_version} Python/{platform.python_version()} almdrlib/{almdrlib_version}",
+                f"alcli/{alcli_version} Python/{platform.python_version()}"
+                f" almdrlib/{almdrlib_version}"
+                f" alsdkdefs/{alsdkdefs_version}",
                 "Alert Logic CLI Utility",
                 prog="alcli")
         
