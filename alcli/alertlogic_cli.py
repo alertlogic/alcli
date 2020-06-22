@@ -23,14 +23,16 @@ from almdrlib.client import Client
 from almdrlib.client import OpenAPIKeyWord
 from almdrlib.region import Region
 from almdrlib.region import Residency
-from almdrlib import __version__ as almdrlib_version
+from almdrlib.version import version as almdrlib_version
 
 from alcli.cliparser import ALCliArgsParser
 from alcli.cliparser import USAGE
 from alcli.clihelp import ALCliMainHelpFormatter
 from alcli.clihelp import ALCliServiceHelpFormatter
 from alcli.clihelp import ALCliOperationHelpFormatter
-from alcli import __version__ as alcli_version
+from alcli.version import version as alcli_version
+
+from alsdkdefs.version import version as alsdkdefs_version
 
 if getattr(sys, 'frozen', False):
     # frozen
@@ -137,7 +139,9 @@ class AlertLogicCLI(object):
     def _create_parser(self, services):
         parser = ALCliArgsParser(
                 services,
-                f"alcli/{alcli_version} Python/{platform.python_version()} almdrlib/{almdrlib_version}",
+                f"alcli/{alcli_version} Python/{platform.python_version()}"
+                f" almdrlib/{almdrlib_version}"
+                f" alsdkdefs/{alsdkdefs_version}",
                 "Alert Logic CLI Utility",
                 prog="alcli")
         

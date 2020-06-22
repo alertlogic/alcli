@@ -1,3 +1,6 @@
+[![Build Status](https://travis-ci.com/alertlogic/alcli.svg?branch=master)](https://travis-ci.com/alertlogic/alcli)
+[![PyPI version](https://badge.fury.io/py/alcli.svg)](https://badge.fury.io/py/alcli)
+
 # Installing the Alert Logic CLI
 The `pip` package manager for Python is used to install, upgrade and remove Alert Logic CLI.
 
@@ -14,9 +17,15 @@ Use `pip3` to install the Alert Logic CLI
 
 Make sure to use `--user` to to install the program to a subdirectory of your user directory to avoid modifying libraries used by your operating system.
 
+### Windows installer
+
+For windows users there is sel-contained Alert Logic CLI distribution is available, please download latest version from [here](http://github.com/alertlogic/alcli/releases/latest/download/alcli_setup.exe)
+
+Alternatively, please view [history](https://github.com/alertlogic/alcli/releases/) of the releases. 
+
 ## **Upgrading to the latest version of the Alert Logic CLI**
 We regularly introduce support for new Alert Logic services.
-We recommend that you check installed packages version and upgrade to the latest version regularly
+We recommend that you check installed packages version and upgrade to the latest version regularly.
 
     $ alcli --version
     

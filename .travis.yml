@@ -1,0 +1,58 @@
+language: python
+env:
+  matrix:
+  - GITHUB_REPO=alertlogic/alcli
+# artifacts upload to private s3 bucket for debugging
+#addons:
+#  artifacts:
+#    s3_region: "us-west-1"
+#    paths:
+#      - dist/
+#      - build/exe.win-amd64-3.8/alcli.exe
+jobs:
+  include:
+  - stage: build
+    python: 3.8
+    install: pip install -U tox-travis
+    script: tox
+    deploy:
+      provider: pypi
+      distributions: sdist bdist_wheel
+      cleanup: false
+      user: __token__
+      password:
+        secure: C3WwKb0JXHhZfXOf5ewVtL8jq9KSa7EyXIaS8tBkTKlJVd/Uh7qeB26CSwiUVmLlzYaB22tE6PtEk96f9f0fquJ6Anw/vumce6au9atl7tfhrg1FZhBuTvGP1g4ousZuWIQkPNebvUQmxwtwcpRQQRtpzcZ6h2Cvapuh86+TXDW+UDLVrKSAbxyjy/2tmELM5C1WvFlFOtVzmZ1YtGCpEhN9q2a/xQbRouTjkwqet2O007D7c8vpq6CzPFqBfbIZpv2iaIEKPEEBtgzSsvuKEjMyEvjO+daWGoPX57LuORDF2nk6PsDh8eMD1TQQv2oYneWMKYjSdlBFTwMNYq8jjg6caKF5qtMcpKKncw9xrAecZ7I6jsooazcScHaRgmGN4H+PPa9uvmYrxFCmI1LZ2OMUjKcrPOI+GzmDOqGE47q09eKZ47+TOw3/2RWd/rcWYLCpAEzAsNLX0HYkQBP9DN+R1tckbooZdcf/OPBK/h8/S00NyO/6uBJO7wSx5v0plWZzI72tsOb1blwImt9q3Dawj/FWl8KCVEvN/k7Fg5b1cghKSc8hgl5+GZRw+Ao98xIzt375TmDzZG3OEcCzsOB98jPA0DQYCRtqgWaA4p9kL1pl+IrYHMa8wx844E/dVLwSlPJEjUDXaGwRmaWN/yBXtYPc3AlnP1E8eStoj/I=
+      on:
+        tags: true
+        repo: "$GITHUB_REPO"
+        python: 3.8
+  - python: 3.7
+    install: pip install -U tox-travis
+    script: tox
+  - stage: windows_build
+    language: shell
+    os: windows
+    install:
+      - powershell "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12"
+      - powershell "Set-ExecutionPolicy Unrestricted"
+      - powershell scripts/windows/install_inno_setup.ps1
+      - powershell scripts/windows/install_verpatch.ps1
+      - choco install python --version=3.8
+      - c:/Python38/Scripts/pip.exe install -r requirements.txt
+      - powershell scripts/windows/patch_json_schema.ps1
+    script:
+      - c:/Python38/python.exe setup.py bdist_msi
+      - c:/Python38/python.exe scripts/windows/write_alcli_version.py
+      - powershell scripts/windows/cleanup.ps1
+      - powershell scripts/windows/verpatch_cli.ps1
+      - powershell scripts/windows/load_sign_cert.ps1
+      - powershell scripts/windows/sign_cli.ps1
+      - powershell scripts/windows/build_inno_setup.ps1
+    deploy:
+      deploy:
+        provider: releases
+        api_key: "$GITHUB_SECRET_TOKEN"
+        skip_cleanup: true
+        file: dist\alcli_setup.exe
+        on:
+          tags: true
