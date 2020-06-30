@@ -51,6 +51,7 @@ jobs:
       - powershell scripts/windows/build_inno_setup.ps1
     deploy:
       provider: releases
+      overwrite: true
       api_key: "$GITHUB_SECRET_TOKEN"
       skip_cleanup: true
       file: dist\alcli_setup.exe
