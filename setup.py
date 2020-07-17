@@ -32,7 +32,7 @@ try:
     sdk_latest_version = defs_info['info']['version']
     sdk_dependency = 'alertlogic-sdk-python>=' + sdk_latest_version
 except:
-    sdk_dependency = 'alertlogic-sdk-python>=1.0.34'
+    sdk_dependency = 'alertlogic-sdk-python>=1.0.35'
 
 requirements = [
         sdk_dependency,
