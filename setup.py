@@ -37,7 +37,7 @@ except:
 requirements = [
         sdk_dependency,
         'configparser==4.0.2',
-        'pyyaml==5.1.2',
+        'pyyaml==5.3.1',
         'jmespath==0.9.4',
         'importlib_metadata==1.6.0'
     ]
