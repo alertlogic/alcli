@@ -39,7 +39,7 @@ requirements = [
         'configparser==4.0.2',
         'pyyaml==5.1.2',
         'jmespath==0.9.4',
-        'importlib_metadata==1.6.0'
+        'importlib_metadata==1.7.0'
     ]
 setup(
     name='alcli',
