@@ -15,6 +15,39 @@ USAGE = (
     f"{HELP_MESSAGE}"
 )
 
+
+class ALCliParserUtils(object):
+    OpenApiToNativeMap = {
+        OpenAPIKeyWord.STRING: str,
+        OpenAPIKeyWord.INTEGER: int,
+        OpenAPIKeyWord.NUMBER: int,
+        OpenAPIKeyWord.BOOLEAN: bool,
+        OpenAPIKeyWord.OBJECT: object,
+        OpenAPIKeyWord.ARRAY: list
+    }
+
+    @staticmethod
+    def compound_schema(schema):
+        compound_schema = schema.get(OpenAPIKeyWord.ANY_OF,
+                                     schema.get(OpenAPIKeyWord.ONE_OF,
+                                                schema.get(OpenAPIKeyWord.ALL_OF)))
+        return compound_schema if isinstance(compound_schema, list) else False
+
+    @staticmethod
+    def detect_array_items_type(array_items_schema):
+        compound_schema = ALCliParserUtils.compound_schema(array_items_schema)
+        if compound_schema:
+            type_maybe = compound_schema[0].get('type')
+            if type_maybe:
+                return type_maybe
+            else:
+                ALCliParserUtils.detect_array_items_type(compound_schema[0])
+
+    @staticmethod
+    def oapi_type_to_native(oapitype):
+        return ALCliParserUtils.OpenApiToNativeMap.get(oapitype, str)
+
+
 class CliHelpAction(argparse.Action):
     def __init__(self, option_strings, dest, formatter, **kwargs):
         print(f"CliHelpAction:__init__ called. option_strings: {option_strings}, dest: {dest}, formatter: {formatter}, kwargs: {kwargs}")
@@ -134,30 +167,40 @@ class ServicesArgsParser(CliArgParserBase):
         subparsers.add_parser('help', spec=None)
         return super().parse_known_args(args, namespace)
 
+
 class OperationArgsParser(CliArgParserBase):
     """
         Alert Logic Service Operation Parser
     """
+
     def __init__(self, *args, **kwargs):
         self._spec = kwargs.pop('spec')
         super().__init__(
-                formatter_class = argparse.RawTextHelpFormatter,
-                add_help=False,
-                conflict_handler='resolve',
-                usage=USAGE)
+            formatter_class=argparse.RawTextHelpFormatter,
+            add_help=False,
+            conflict_handler='resolve',
+            usage=USAGE)
+
+    def make_parameter_argument(self, schema):
+        type = schema.get(OpenAPIKeyWord.TYPE)
+        required = schema.get(OpenAPIKeyWord.REQUIRED, False)
+        parser_type = ALCliParserUtils.oapi_type_to_native(schema.get('type'))
+        if type == 'array':
+            items_type = ALCliParserUtils.detect_array_items_type(schema.get('items', {}))
+            if items_type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
+                return {'nargs': '+', 'type': ALCliParserUtils.oapi_type_to_native(items_type), 'required': required}
+            else:
+                return {'required': required}
+        else:
+            return {'required': required, 'type': parser_type}
 
     def parse_known_args(self, args=None, namespace=None):
         # Add Operation arguments to the parser
         if 'help' in args:
             self.add_argument('help')
             return super().parse_known_args(args, namespace)
-        elif not self._spec is None:
-            for key, value in self._spec[OpenAPIKeyWord.PARAMETERS].items():
-                type = value.get(OpenAPIKeyWord.TYPE)
-                if type == 'array':
-                    self.add_argument(f"--{key}", nargs='+', required=value.get(OpenAPIKeyWord.REQUIRED))
-                else:
-                    self.add_argument(f"--{key}", required=value.get(OpenAPIKeyWord.REQUIRED))
-
+        elif self._spec is not None:
+            for name, schema in self._spec[OpenAPIKeyWord.PARAMETERS].items():
+                kwargs = self.make_parameter_argument(schema)
+                self.add_argument(f"--{name}", **kwargs)
         return super().parse_known_args(args, namespace)
-
