@@ -26,6 +26,7 @@ from almdrlib.region import Residency
 from almdrlib.version import version as almdrlib_version
 
 from alcli.cliparser import ALCliArgsParser
+from alcli.cliparser import ALCliParserUtils
 from alcli.cliparser import USAGE
 from alcli.clihelp import ALCliMainHelpFormatter
 from alcli.clihelp import ALCliServiceHelpFormatter
@@ -257,8 +258,18 @@ class ServiceOperation(object):
         type = parameter[OpenAPIKeyWord.TYPE]
         if type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
             return param_value
-        
-        if type == OpenAPIKeyWord.OBJECT:
+
+        if type == OpenAPIKeyWord.ARRAY:
+            items_type = ALCliParserUtils.detect_array_items_type(schema.get('items', {}))
+            if items_type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
+                return param_value
+            else:
+                try:
+                    return json.loads(param_value)
+                except JSONDecodeError as e:
+                    logging.error(f"{e}")
+
+        if type in OpenAPIKeyWord.OBJECT:
             try:
                 return json.loads(param_value)
             except JSONDecodeError as e:
