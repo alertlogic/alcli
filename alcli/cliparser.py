@@ -21,9 +21,7 @@ class ALCliParserUtils(object):
         OpenAPIKeyWord.STRING: str,
         OpenAPIKeyWord.INTEGER: int,
         OpenAPIKeyWord.NUMBER: int,
-        OpenAPIKeyWord.BOOLEAN: bool,
-        OpenAPIKeyWord.OBJECT: object,
-        OpenAPIKeyWord.ARRAY: list
+        OpenAPIKeyWord.BOOLEAN: bool
     }
 
     @staticmethod
