@@ -259,12 +259,14 @@ class ServiceOperation(object):
         anyof = parameter.get(OpenAPIKeyWord.ANY_OF)
         allof = parameter.get(OpenAPIKeyWord.ALL_OF)
 
-        if oneof or anyof:
-            # Take first type available, assuming same parameter must not be of different type
-            parameter_type = oneof[0]['type']
-        elif allof:
+        if oneof or anyof or allof:
             # Attempt to find type in the decomposed schema
-            parameter_type = [t.get('type') for t in allof if t.get('type')][0]
+            find_type = [t.get('type') for t in allof or anyof or oneof if t.get('type')]
+            parameter_type = find_type[0] if find_type else None
+
+        if not parameter_type:
+            # If failed to figure parameter_type out, fallback to object
+            parameter_type = OpenAPIKeyWord.OBJECT
 
         if parameter_type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
             return param_value
