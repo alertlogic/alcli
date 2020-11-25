@@ -249,17 +249,29 @@ class ServiceOperation(object):
             p = urlparse(param_value)
             if p.scheme == "file":
                 value_file_path = os.path.abspath(os.path.join(p.netloc, p.path))
-                with open (value_file_path, "r") as value_file:
+                with open(value_file_path, "r") as value_file:
                     param_value = value_file.read()
 
         schema = operation.get_schema()
         parameter = schema[OpenAPIKeyWord.PARAMETERS][param_name]
+        parameter_type = parameter.get(OpenAPIKeyWord.TYPE)
+        oneof = parameter.get(OpenAPIKeyWord.ONE_OF)
+        anyof = parameter.get(OpenAPIKeyWord.ANY_OF)
+        allof = parameter.get(OpenAPIKeyWord.ALL_OF)
 
-        type = parameter[OpenAPIKeyWord.TYPE]
-        if type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
+        if oneof or anyof or allof:
+            # Attempt to find type in the decomposed schema
+            find_type = [t.get('type') for t in allof or anyof or oneof if t.get('type')]
+            parameter_type = find_type[0] if find_type else None
+
+        if not parameter_type:
+            # If failed to figure parameter_type out, fallback to object
+            parameter_type = OpenAPIKeyWord.OBJECT
+
+        if parameter_type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
             return param_value
 
-        if type == OpenAPIKeyWord.ARRAY:
+        if parameter_type == OpenAPIKeyWord.ARRAY:
             items_type = ALCliParserUtils.detect_array_items_type(schema.get('items', {}))
             if items_type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
                 return param_value
@@ -269,7 +281,7 @@ class ServiceOperation(object):
                 except JSONDecodeError as e:
                     logging.error(f"{e}")
 
-        if type in OpenAPIKeyWord.OBJECT:
+        if parameter_type in OpenAPIKeyWord.OBJECT:
             try:
                 return json.loads(param_value)
             except JSONDecodeError as e:
