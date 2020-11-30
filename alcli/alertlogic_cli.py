@@ -200,7 +200,7 @@ class ServiceOperation(object):
             try:
                 self._print_result(res.json(), parsed_globals.query)
             except json.decoder.JSONDecodeError:
-                print(f'HTTP Status Code: {res.status_code}')
+                print(f'HTTP Status Code: {res.status_code}\n{res.text}')
 
     def get_service_api(self, service_name):
         return Session.get_service_api(service_name=service_name)
