@@ -200,5 +200,10 @@ class OperationArgsParser(CliArgParserBase):
         elif self._spec is not None:
             for name, schema in self._spec[OpenAPIKeyWord.PARAMETERS].items():
                 kwargs = self.make_parameter_argument(schema)
-                self.add_argument(f"--{name}", **kwargs)
+                type = schema.get(OpenAPIKeyWord.TYPE)
+                if type == 'boolean':
+                    self.add_argument(f"--{name}",
+                                      action='store_true')
+                else:
+                    self.add_argument(f"--{name}", **kwargs)
         return super().parse_known_args(args, namespace)
