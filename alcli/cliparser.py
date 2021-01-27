@@ -223,7 +223,7 @@ class StringToBoolAction(argparse.Action):
             **kwargs)
 
     def value_to_bool(self, value):
-        true_vals = ['true', 'yes', '1']
+        true_vals = ['true', 'yes', 'y', '1']
         if isinstance(value, bool):
             return value
         elif value.lower() in true_vals:
