@@ -8,7 +8,7 @@
 #define MyAppPublisher "Alert Logic, Inc."
 #define MyAppURL "https://github.com/alertlogic/alcli"
 #define MyAppExeName "alcli.exe"
-#define WorkingDir "C:\Users\travis\build\alertlogic\alcli\"
+#define WorkingDir "{%GITHUB_WORKSPACE}"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -22,14 +22,14 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 AppCopyright=Copyright (C) 2020 Alert Logic, Inc.
-SetupIconFile="{#WorkingDir}icons/alertlogic-win.ico"
-WizardImageFile="{#WorkingDir}icons/alertlogic-modern-image.bmp"
-WizardSmallImageFile="{#WorkingDir}icons/alertlogic-modern-small-image.bmp"
+SetupIconFile="{%GITHUB_WORKSPACE}icons/alertlogic-win.ico"
+WizardImageFile="{%GITHUB_WORKSPACE}icons/alertlogic-modern-image.bmp"
+WizardSmallImageFile="{%GITHUB_WORKSPACE}icons/alertlogic-modern-small-image.bmp"
 DefaultDirName={autopf}\{#MyAppDirectory}
 DisableWelcomePage=no
 DisableReadyPage=yes
 DisableProgramGroupPage=yes
-LicenseFile={#WorkingDir}LICENSE
+LicenseFile={%GITHUB_WORKSPACE}LICENSE
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=commandline
@@ -50,10 +50,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "envPath"; Description: "Add to PATH variable" 
 
 [Files]
-Source: "{#WorkingDir}build\exe.win-amd64-3.8\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#WorkingDir}build\exe.win-amd64-3.8\lib\*"; DestDir: "{app}\Lib"; Excludes: "{#WorkingDir}build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll,{#WorkingDir}build\exe.win-amd64-3.8\lib\test\*,{#WorkingDir}build\exe.win-amd64-3.8\lib\*\test\*"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{#WorkingDir}build\exe.win-amd64-3.8\python38.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{#WorkingDir}build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\*"; DestDir: "{app}\Lib"; Excludes: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll,{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\test\*,{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\*\test\*"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\python38.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
