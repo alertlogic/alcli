@@ -182,15 +182,19 @@ class OperationArgsParser(CliArgParserBase):
     def make_parameter_argument(self, schema):
         type = schema.get(OpenAPIKeyWord.TYPE)
         required = schema.get(OpenAPIKeyWord.REQUIRED, False)
+        default = schema.get(OpenAPIKeyWord.DEFAULT, None)
         parser_type = ALCliParserUtils.oapi_type_to_native(schema.get('type'))
         if type == 'array':
             items_type = ALCliParserUtils.detect_array_items_type(schema.get('items', {}))
             if items_type in OpenAPIKeyWord.SIMPLE_DATA_TYPES:
-                return {'nargs': '+', 'type': ALCliParserUtils.oapi_type_to_native(items_type), 'required': required}
+                return {'nargs': '+', 'type': ALCliParserUtils.oapi_type_to_native(items_type), 'required': required,
+                        'default': default}
             else:
-                return {'required': required}
+                return {'required': required, 'default': default}
+        elif type == OpenAPIKeyWord.BOOLEAN:
+            return {'required': required, 'default': default, 'action': StringToBoolAction}
         else:
-            return {'required': required, 'type': parser_type}
+            return {'required': required, 'type': parser_type, 'default': default}
 
     def parse_known_args(self, args=None, namespace=None):
         # Add Operation arguments to the parser
@@ -200,10 +204,33 @@ class OperationArgsParser(CliArgParserBase):
         elif self._spec is not None:
             for name, schema in self._spec[OpenAPIKeyWord.PARAMETERS].items():
                 kwargs = self.make_parameter_argument(schema)
-                type = schema.get(OpenAPIKeyWord.TYPE)
-                if type == 'boolean':
-                    self.add_argument(f"--{name}",
-                                      action='store_true')
-                else:
-                    self.add_argument(f"--{name}", **kwargs)
+                self.add_argument(f"--{name}", **kwargs)
         return super().parse_known_args(args, namespace)
+
+
+class StringToBoolAction(argparse.Action):
+
+    def __init__(self,
+                 option_strings,
+                 dest, nargs=1, **kwargs):
+        if kwargs.get('default') is not None:
+            kwargs['default'] = self.value_to_bool(kwargs['default'])
+
+        super(StringToBoolAction, self).__init__(
+            option_strings=option_strings,
+            dest=dest,
+            nargs=1,
+            **kwargs)
+
+    def value_to_bool(self, value):
+        true_vals = ['true', 'yes', 'y', '1']
+        if isinstance(value, bool):
+            return value
+        elif value.lower() in true_vals:
+            return True
+        else:
+            return False
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        (value,) = tuple(values)
+        setattr(namespace, self.dest, self.value_to_bool(value))
