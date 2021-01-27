@@ -49,11 +49,15 @@ jobs:
       - powershell scripts/windows/load_sign_cert.ps1
       - powershell scripts/windows/sign_cli.ps1
       - powershell scripts/windows/build_inno_setup.ps1
+      - mv dist\alcli*.msi dist\alcli_setup.msi
+      - powershell scripts/windows/sign_cli_msi.ps1
     deploy:
       provider: releases
       overwrite: true
       api_key: "$GITHUB_SECRET_TOKEN"
       skip_cleanup: true
-      file: dist\alcli_setup.exe
+      file:
+        - dist\alcli_setup.exe
+        - dist\alcli_setup.msi
       on:
         tags: true
