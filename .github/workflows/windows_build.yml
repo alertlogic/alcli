@@ -12,39 +12,49 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v2
-#      - name: Build windows CLI
-#        run: |
-      - name: Dump GitHub context
-        env:
-          GITHUB_CONTEXT: ${{ toJSON(github) }}
-        run: echo "$GITHUB_CONTEXT"
-      - name: Dump job context
-        env:
-          JOB_CONTEXT: ${{ toJSON(job) }}
-        run: echo "$JOB_CONTEXT"
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJSON(steps) }}
-        run: echo "$STEPS_CONTEXT"
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJSON(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJSON(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJSON(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
-      - name: Upload Release Asset
-        id: upload-release-asset
+      - uses: actions/setup-python@v2
+        with:
+          python-version: '3.x'
+      - name: Install requirements
+        run: |
+          python -m pip install -r requirements.txt
+          python -m pip install setuptools_scm[toml]>=3.4 setuptools>=42 wheel
+      - name: Install windows requirements, prepare
+        run: |
+          powershell "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12"
+          powershell "Set-ExecutionPolicy Unrestricted"
+          powershell scripts/windows/install_inno_setup.ps1
+          powershell scripts/windows/install_verpatch.ps1
+      - name: Build
+        run: |
+          python setup.py bdist_msi
+          python scripts/windows/write_alcli_version.py
+      - name: Sign
+        run: |
+          powershell scripts/windows/cleanup.ps1
+          powershell scripts/windows/verpatch_cli.ps1
+          powershell scripts/windows/load_sign_cert.ps1
+          powershell scripts/windows/sign_cli.ps1
+          powershell scripts/windows/build_inno_setup.ps1
+          mv dist\alcli*.msi dist\alcli_setup.msi
+          powershell scripts/windows/sign_cli_msi.ps1
+      - name: Upload Release executable setup
+        id: upload-exe-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./AlertLogicOpenAPIDefinitions.zip
-          asset_name: AlertLogicOpenAPIDefinitions.zip
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist\alcli_setup.exe
+          asset_name: AL CLI executable setup
+          asset_content_type: application/zip
+      - name: Upload Release MSI setup
+        id: upload-msi-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist\alcli_setup.msi
+          asset_name: AL CLI MSI setup
           asset_content_type: application/zip
