@@ -182,7 +182,7 @@ class OperationArgsParser(CliArgParserBase):
     def make_parameter_argument(self, schema):
         type = schema.get(OpenAPIKeyWord.TYPE)
         required = schema.get(OpenAPIKeyWord.REQUIRED, False)
-        default = schema.get(OpenAPIKeyWord.DEFAULT)
+        default = schema.get(OpenAPIKeyWord.DEFAULT, None)
         parser_type = ALCliParserUtils.oapi_type_to_native(schema.get('type'))
         if type == 'array':
             items_type = ALCliParserUtils.detect_array_items_type(schema.get('items', {}))
