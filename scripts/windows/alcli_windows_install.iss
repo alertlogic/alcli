@@ -29,7 +29,7 @@ DefaultDirName={autopf}\{#MyAppDirectory}
 DisableWelcomePage=no
 DisableReadyPage=yes
 DisableProgramGroupPage=yes
-LicenseFile={%GITHUB_WORKSPACE}LICENSE
+LicenseFile=..\..\LICENSE
 ; Uncomment the following line to run in non administrative install mode (install for current user only.)
 PrivilegesRequired=admin
 PrivilegesRequiredOverridesAllowed=commandline

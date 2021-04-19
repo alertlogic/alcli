@@ -3,9 +3,12 @@
 
 name: Add gh release
 on:
-  release:
-    types:
-      - created
+  push:
+    branches:
+      - '**'
+#  release:
+#    types:
+#      - created
 
 jobs:
   deploy:
@@ -37,27 +40,30 @@ jobs:
           powershell scripts/windows/cleanup.ps1
           powershell scripts/windows/verpatch_cli.ps1
           powershell scripts/windows/load_sign_cert.ps1
-          powershell scripts/windows/sign_cli.ps1
+#          powershell scripts/windows/sign_cli.ps1
           powershell scripts/windows/build_inno_setup.ps1
           mv dist\alcli*.msi dist\alcli_setup.msi
           powershell scripts/windows/sign_cli_msi.ps1
-      - name: Upload Release executable setup
-        id: upload-exe-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist\alcli_setup.exe
-          asset_name: AL CLI executable setup
-          asset_content_type: application/zip
-      - name: Upload Release MSI setup
-        id: upload-msi-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist\alcli_setup.msi
-          asset_name: AL CLI MSI setup
-          asset_content_type: application/zip
+      - name: Test all done
+        run: |
+          dir dist\*; ls dist/*
+#      - name: Upload Release executable setup
+#        id: upload-exe-asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ github.event.release.upload_url }}
+#          asset_path: dist\alcli_setup.exe
+#          asset_name: AL CLI executable setup
+#          asset_content_type: application/zip
+#      - name: Upload Release MSI setup
+#        id: upload-msi-asset
+#        uses: actions/upload-release-asset@v1
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#        with:
+#          upload_url: ${{ github.event.release.upload_url }}
+#          asset_path: dist\alcli_setup.msi
+#          asset_name: AL CLI MSI setup
+#          asset_content_type: application/zip
