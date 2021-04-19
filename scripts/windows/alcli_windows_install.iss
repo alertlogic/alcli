@@ -22,9 +22,9 @@ AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 AppCopyright=Copyright (C) 2020 Alert Logic, Inc.
-SetupIconFile="{%GITHUB_WORKSPACE}icons/alertlogic-win.ico"
-WizardImageFile="{%GITHUB_WORKSPACE}icons/alertlogic-modern-image.bmp"
-WizardSmallImageFile="{%GITHUB_WORKSPACE}icons/alertlogic-modern-small-image.bmp"
+SetupIconFile="../../icons/alertlogic-win.ico"
+WizardImageFile="../../icons/alertlogic-modern-image.bmp"
+WizardSmallImageFile="../../icons/alertlogic-modern-small-image.bmp"
 DefaultDirName={autopf}\{#MyAppDirectory}
 DisableWelcomePage=no
 DisableReadyPage=yes
@@ -50,10 +50,10 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 Name: "envPath"; Description: "Add to PATH variable" 
 
 [Files]
-Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\*"; DestDir: "{app}\Lib"; Excludes: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll,{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\test\*,{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\*\test\*"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\python38.dll"; DestDir: "{app}"; Flags: ignoreversion
-Source: "{%GITHUB_WORKSPACE}build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\build\exe.win-amd64-3.8\alcli.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\build\exe.win-amd64-3.8\lib\*"; DestDir: "{app}\Lib"; Excludes: "..\..\build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll,..\..\build\exe.win-amd64-3.8\lib\test\*,..\..\build\exe.win-amd64-3.8\lib\*\test\*"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "..\..\build\exe.win-amd64-3.8\python38.dll"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\..\build\exe.win-amd64-3.8\lib\VCRUNTIME140.dll"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
