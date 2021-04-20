@@ -20,6 +20,7 @@ jobs:
           python-version: '3.8'
       - name: Install requirements
         run: |
+          ls C:\Python38\Lib\site-packages\*
           python -m pip install -r requirements.txt
           python -m pip install setuptools_scm[toml]>=3.4 setuptools>=42 wheel
       - name: Install windows requirements, prepare
