@@ -1,14 +1,11 @@
 # This workflow will install Python dependencies, run tests and lint with a variety of Python versions
 # For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
 
-name: Build and sign windows artefacts
+name: Build and sign windows artefacts, release
 on:
-  push:
-    branches:
-      - '**'
-#  release:
-#    types:
-#      - created
+  release:
+    types:
+      - created
 
 jobs:
   deploy:
@@ -20,17 +17,18 @@ jobs:
           python-version: '3.8'
       - name: Install requirements
         run: |
-          ls C:\Python38\Lib\site-packages\*
           python -m pip install -r requirements.txt
           python -m pip install setuptools_scm[toml]>=3.4 setuptools>=42 wheel
       - name: Install windows requirements, prepare
         run: |
           powershell "[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::TLS12"
           powershell "Set-ExecutionPolicy Unrestricted"
+          powershell scripts/windows/install_inno_setup.ps1
           powershell scripts/windows/install_verpatch.ps1
+          powershell scripts/windows/patch_json_schema.ps1
       - name: Build
         run: |
-          python setup.py bdist_msi --add-to-path=True
+          python setup.py bdist_msi
           python scripts/windows/write_alcli_version.py
       - name: Sign
         env:
@@ -40,15 +38,15 @@ jobs:
           powershell scripts/windows/cleanup.ps1
           powershell scripts/windows/verpatch_cli.ps1
           powershell scripts/windows/load_sign_cert.ps1
-          mv dist\alcli*.msi dist\alcli_setup.msi
-          powershell scripts/windows/sign_cli_msi.ps1
-      - name: Upload Release MSI setup
-        id: upload-msi-asset
+          powershell scripts/windows/sign_cli.ps1
+          powershell scripts/windows/build_inno_setup.ps1
+      - name: Upload Release executable setup
+        id: upload-exe-asset
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist\alcli_setup.msi
-          asset_name: AL CLI MSI setup
+          asset_path: dist\alcli_setup.exe
+          asset_name: AL CLI executable setup
           asset_content_type: application/zip

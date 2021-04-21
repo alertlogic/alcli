@@ -87,7 +87,7 @@ setup(
             'include_msvcr': True
         },
         'bdist_msi': {
-            'add_to_path': True
+            'add_to_path': False
         }
     },
     executables = executables,
