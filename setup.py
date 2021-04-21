@@ -82,12 +82,12 @@ setup(
     },
     options = {
         'build_exe': {
-            'packages': ['os', 'sys', 'ctypes', 'jsonschema', 'almdrlib', 'alcli'],
+            'packages': ['os', 'sys', 'ctypes', 'jsonschema', 'html', 'almdrlib', 'alcli'],
             'excludes': ['tkinter','tcl','ttk'],
             'include_msvcr': True
         },
         'bdist_msi': {
-            'add_to_path': False
+            'add_to_path': True
         }
     },
     executables = executables,
