@@ -40,6 +40,8 @@ jobs:
           powershell scripts/windows/load_sign_cert.ps1
           powershell scripts/windows/sign_cli.ps1
           powershell scripts/windows/build_inno_setup.ps1
+          mv dist\alcli*.msi dist\alcli_setup.msi
+          powershell scripts/windows/sign_cli_msi.ps1
       - name: Upload Release executable setup
         id: upload-exe-asset
         uses: actions/upload-release-asset@v1
