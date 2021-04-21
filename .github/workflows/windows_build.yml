@@ -50,3 +50,13 @@ jobs:
           asset_path: dist\alcli_setup.exe
           asset_name: AlertlogicCLISetup.exe
           asset_content_type: application/zip
+      - name: Upload Release MSI setup
+        id: upload-msi-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ github.event.release.upload_url }}
+          asset_path: dist\alcli_setup.msi
+          asset_name: AlertlogicCLISetup.msi
+          asset_content_type: application/zip
