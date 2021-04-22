@@ -31,14 +31,10 @@ Alternatively, please view [history](https://github.com/alertlogic/alcli/release
 We regularly introduce support for new Alert Logic services.
 We recommend that you check installed packages version and upgrade to the latest version regularly.
 
-    $ alcli --version
-    
-	$ pip3 list -o
-	Package    				Version  Latest   Type 
-	---------- 				-------- -------- -----
-	alcli     				1.0.1 	 1.0.2 	  sdist
-	alertlogic-sdk-python   1.0.2 	 1.0.2    sdist
-	
+```
+$ pip3 install --upgrade --force-reinstall alcli
+```
+
 ## Configure the Alert Logic CLI with Your Credentials
 Before you can run a CLI command, you must configure the Alert Logic's CLI with your credentials.
 
