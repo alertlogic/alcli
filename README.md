@@ -1,6 +1,7 @@
 
-[![Build Status](https://github.com/alertlogic/alcli/actions/workflows/release_pypi.yml/badge.svg](https://github.com/alertlogic/alcli/actions)
-[![Windows Build](https://github.com/alertlogic/alcli/actions/workflows/windows_build.yml/badge.svg](https://github.com/alertlogic/alcli/actions)
+[![Build Status](https://github.com/alertlogic/alcli/actions/workflows/release_pypi.yml/badge.svg)](https://github.com/alertlogic/alcli/actions)
+[![Windows Build](https://github.com/alertlogic/alcli/actions/workflows/windows_build.yml/badge.svg)](https://github.com/alertlogic/alcli/actions)
+[![Tests](https://github.com/alertlogic/alcli/actions/workflows/test_all.yml/badge.svg)](https://github.com/alertlogic/alcli/actions)
 [![PyPI version](https://badge.fury.io/py/alcli.svg)](https://badge.fury.io/py/alcli)
 
 # Installing the Alert Logic CLI
