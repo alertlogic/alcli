@@ -84,7 +84,7 @@ class AlertLogicCLI(object):
 
         parsed_args, remaining = parser.parse_known_args(args)
         logger.debug(f"Parsed Arguments: {parsed_args}, Remaining: {remaining}")
-        
+
         if parsed_args.service == 'help' or parsed_args.service is None:
             AlertLogicCLI.show_help(
                      ALCliMainHelpFormatter(Session.list_services())
@@ -145,7 +145,7 @@ class AlertLogicCLI(object):
                 f" alsdkdefs/{alsdkdefs_version}",
                 "Alert Logic CLI Utility",
                 prog="alcli")
-        
+
         # Add Global Options
         parser.add_argument('--access_key_id', dest='access_key_id', default=None)
         parser.add_argument('--secret_key', dest='secret_key', default=None)
@@ -181,7 +181,7 @@ class ServiceOperation(object):
         for name, value in parsed_globals.__dict__.items():
             if name == 'operation':
                 operation_name = value
-            elif name == 'debug': 
+            elif name == 'debug':
                 if value:
                     almdrlib.set_logger('almdrlib', logging.DEBUG, format_string=LOG_FORMAT)
             elif name == 'service':
@@ -190,17 +190,20 @@ class ServiceOperation(object):
                 continue
             else:
                 kwargs[name] = value
-        
+
         service = self._init_service(parsed_globals)
         operation = service.operations.get(operation_name, None)
         if operation:
             # Remove optional arguments that haven't been supplied
             op_args = {k:self._encode(operation, k, v) for (k,v) in kwargs.items() if v is not None}
             res = operation(**op_args)
-            try:
-                self._print_result(res.json(), parsed_globals.query)
-            except json.decoder.JSONDecodeError:
-                print(f'HTTP Status Code: {res.status_code}\n{res.text}')
+            if res.headers['content-type'] == 'text/plain':
+                print(res.text)
+            else:
+                try:
+                    self._print_result(res.json(), parsed_globals.query)
+                except json.decoder.JSONDecodeError:
+                    print(f'HTTP Status Code: {res.status_code}\n{res.text}')
 
     def get_service_api(self, service_name):
         return Session.get_service_api(service_name=service_name)
@@ -302,7 +305,7 @@ class ServiceOperation(object):
 
     def _print_result(self, result, query):
         if query:
-            result = jmespath.search(query, result) 
+            result = jmespath.search(query, result)
         print(f"{json.dumps(result, sort_keys=True, indent=4)}")
 
 
@@ -318,4 +321,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
