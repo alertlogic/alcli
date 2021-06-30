@@ -190,17 +190,20 @@ class ServiceOperation(object):
                 continue
             else:
                 kwargs[name] = value
-        
+
         service = self._init_service(parsed_globals)
         operation = service.operations.get(operation_name, None)
         if operation:
             # Remove optional arguments that haven't been supplied
             op_args = {k:self._encode(operation, k, v) for (k,v) in kwargs.items() if v is not None}
             res = operation(**op_args)
-            try:
-                self._print_result(res.json(), parsed_globals.query)
-            except json.decoder.JSONDecodeError:
-                print(f'HTTP Status Code: {res.status_code}\n{res.text}')
+            if res.headers['content-type'] == 'text/plain':
+                print(res.text)
+            else:
+                try:
+                    self._print_result(res.json(), parsed_globals.query)
+                except json.decoder.JSONDecodeError:
+                    print(f'HTTP Status Code: {res.status_code}\n{res.text}')
 
     def get_service_api(self, service_name):
         return Session.get_service_api(service_name=service_name)
