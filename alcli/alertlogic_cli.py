@@ -197,7 +197,7 @@ class ServiceOperation(object):
             # Remove optional arguments that haven't been supplied
             op_args = {k:self._encode(operation, k, v) for (k,v) in kwargs.items() if v is not None}
             res = operation(**op_args)
-            if res.headers['content-type'] == 'text/plain':
+            if res.headers.get('content-type') == 'text/plain':
                 print(res.text)
             else:
                 try:
