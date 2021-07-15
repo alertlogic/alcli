@@ -6,7 +6,7 @@ configparser==4.0.2
 idna==2.8
 PyYAML>=5.4
 requests==2.22.0
-urllib3==1.25.8
+urllib3==1.26.5
 cx_Freeze==6.1
 setuptools>=42
 wheel
