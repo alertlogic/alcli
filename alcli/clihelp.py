@@ -116,7 +116,7 @@ class ALCliHelpFormatter():
         yield f'{title}'
         yield FormatHelp.SECTION_BREAK
         yield f'{self.bold("NAME")}'
-        yield f'\t{self.name} - '
+        yield f'\t{self.name}'
         yield ''
 
         
@@ -368,11 +368,11 @@ class ALCliOperationHelpFormatter(ALCliHelpFormatter):
             properties = spec.get('properties', {})
             for prop_name, prop_spec in sorted(properties.items()):
                 yield ''
-                prop_title = (
-                        f'o {self.bold(prop_name)} - '
-                        f'{prop_spec.get("description", "")}'
-                    )
-
+                prop_desc = prop_spec.get("description")
+                if prop_desc:
+                    prop_title = f'o {self.bold(prop_name)} - 'f'{prop_desc}'
+                else:
+                    prop_title = f'o {self.bold(prop_name)}'
                 yield from self.wraptext(
                         prop_title,
                         initial_indent=indent,
@@ -418,9 +418,14 @@ class ALCliOperationHelpFormatter(ALCliHelpFormatter):
 
         for s in spec:
             yield ''
-            title = self.bold(s.get('title')) + \
-                    f' ({get_param_type(s)}) - ' + \
-                    s.get('description')
+            param_title = s.get('title')
+            param_desc = s.get('description')
+            if param_title and param_desc:
+                title = self.bold(param_title) + f' ({get_param_type(s)}) - ' + param_desc
+            elif param_title:
+                title = self.bold(param_title) + f' ({get_param_type(s)})'
+            else:
+                title = f'({get_param_type(s)})'
             yield from self.wraptext(
                     title,
                     initial_indent=indent,
