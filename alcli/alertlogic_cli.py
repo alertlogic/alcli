@@ -11,6 +11,7 @@ import logging
 import argparse
 import re
 import pydoc
+import shutil 
 
 from urllib.parse import urlparse
 from collections import OrderedDict
@@ -68,8 +69,9 @@ def cli_pager(text):
 def get_cli_pager():
     if sys.platform == 'win32':
         return lambda text: pydoc.pipepager(text, 'more /C')
-    if hasattr(os, 'system') and os.system('(less) 2>/dev/null') == 0:
+    if shutil.which('less') is not None:
         return lambda text: pydoc.pipepager(text, 'less -R')
+    return lambda text: print(text)
 
 class AlertLogicCLI(object):
     def __init__(self):

@@ -6,6 +6,7 @@ import os
 import json
 import textwrap
 import itertools
+import shutil
 from almdrlib.session import Session
 from almdrlib.region import Region
 from almdrlib.region import Residency
@@ -42,11 +43,7 @@ def get_param_type(spec):
                 f'Unsupported parameter type. {json.dumps(spec, indent=2)}')
 
 class FormatHelp:
-    if sys.platform == 'win32':
-        BOLD = ''
-        UNDERLINE = ''
-        END = ''
-    elif hasattr(os, 'system') and os.system('(less) 2>/dev/null') == 0:
+    if shutil.which('less') is not None:
         BOLD = '\033[1m'
         UNDERLINE = '\033[4m'
         END = '\033[0m'
