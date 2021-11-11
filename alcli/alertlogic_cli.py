@@ -284,7 +284,14 @@ class ServiceOperation(object):
                 try:
                     return json.loads(param_value)
                 except JSONDecodeError as e:
-                    logging.error(f"{e}")
+                    import textwrap
+                    bad_input_lines = param_value.split('\n')
+                    bad_input_lines.insert(e.lineno, ' ' * (e.colno - 1) + "^ ERROR")
+                    explainer = '\n'.join(bad_input_lines)
+                    explainer = textwrap.indent(explainer, '    ')
+                    logger.error(f"Unable to parse input as JSON.  "
+                                 f"Line {e.lineno}, column {e.colno}: {e.msg}\n"
+                                 f"Input:\n{explainer}\nFalling back to using the input as a string.")
 
         if parameter_type in OpenAPIKeyWord.OBJECT:
             try:
