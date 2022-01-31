@@ -199,7 +199,9 @@ class ServiceOperation(object):
             # Remove optional arguments that haven't been supplied
             op_args = {k:self._encode(operation, k, v) for (k,v) in kwargs.items() if v is not None}
             res = operation(**op_args)
-            if res.headers.get('content-type') == 'text/plain':
+            content_type = res.headers.get('content-type')
+            json_content_types = ['application/json', 'alertlogic/json']
+            if content_type and content_type not in json_content_types:
                 print(res.text)
             else:
                 try:
@@ -307,7 +309,10 @@ class ServiceOperation(object):
                     (m.groupdict()['key'], m.groupdict()['value'])
                     for m in regex.finditer(param_value)
                 )
-                return result
+                if result:
+                    return result
+                else:
+                    return param_value
 
         # TODO Raise an exception if we can't build a dictionary from the provided input
         return param_value
