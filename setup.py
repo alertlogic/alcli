@@ -38,7 +38,7 @@ requirements = [
         sdk_dependency,
         'configparser==4.0.2',
         'pyyaml>=5.4',
-        'jmespath==0.9.4',
+        'jmespath==0.9.5',
         'importlib_metadata==1.6.0'
     ]
 setup(
