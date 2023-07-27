@@ -4,10 +4,13 @@ on:
     types:
       - created
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+        - uses: ./.github/workflows/run_tests
   release:
     runs-on: windows-latest
     steps:
-      - uses: ./.github/workflows/run_tests
       - uses: ./.github/workflows/build_windows
       - name: Upload Release executable setup
         id: upload-exe-asset

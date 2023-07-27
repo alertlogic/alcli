@@ -1,0 +1,43 @@
+name: Run Scheduled Tests
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Run every day at 12:00 UTC
+    - cron:  '00 12 * * *'  
+
+jobs:
+  test_code:
+    steps:
+        - uses: ./.github/workflows/run_tests
+  test_python_build:
+    steps:
+        - uses: ./.github/workflows/build_python
+  test_windows_build:
+    steps:
+        - uses: ./.github/workflows/build_windows
+  alert:
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - name: Run Tests
+        run: |
+          curl --request POST \
+               --url https://events.pagerduty.com/v2/enqueue \
+               --header 'Content-Type: application/json' \
+               --data '{
+                  "payload": {
+                      "summary": "Failed to run scheduled test for alcli",
+                      "severity": "error",
+                      "source": "https://github.com/alertlogic/alcli"
+                  },
+                  "routing_key": "551f474142b44702c00f0861398f614a",
+                  "dedup_key": "alcli_failure",
+                  "event_action": "trigger",
+                  "links": [
+                      {
+                          "href": "https://github.com/alertlogic/alcli",
+                          "text": "alcli repo"
+                      }
+                  ]
+              }'
