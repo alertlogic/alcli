@@ -1,20 +1,16 @@
-# This workflow will install Python dependencies, run tests and lint with a variety of Python versions
-# For more information see: https://help.github.com/actions/language-and-framework-guides/using-python-with-github-actions
-
-name: Build and sign windows artifacts, release
+name: Build and sign windows artifacts
 on:
-  release:
-    types:
-      - created
+  pull_request:
+  workflow_call:
 
 jobs:
-  deploy:
+  build:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.8'
+          python-version: "3.8"
       - name: Install requirements
         run: |
           python -m pip install -r requirements.txt
@@ -43,23 +39,3 @@ jobs:
           powershell scripts/windows/build_inno_setup.ps1
           mv dist\alcli*.msi dist\alcli_setup.msi
           powershell scripts/windows/sign_cli_msi.ps1
-      - name: Upload Release executable setup
-        id: upload-exe-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist\alcli_setup.exe
-          asset_name: AlertlogicCLISetup.exe
-          asset_content_type: application/zip
-      - name: Upload Release MSI setup
-        id: upload-msi-asset
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: dist\alcli_setup.msi
-          asset_name: AlertlogicCLISetup.msi
-          asset_content_type: application/zip

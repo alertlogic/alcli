@@ -41,9 +41,26 @@ requirements = [
         'jmespath==0.9.5',
         'importlib_metadata==1.6.0'
     ]
+
+# Prevent setuptools_scm from adding 'dev' to the version for branch CI testing
+def version_generator():
+
+    def semver_version(version):
+        from setuptools_scm.version import guess_next_version
+        if version.distance==0:
+            return version.format_with("{tag}")
+        return version.format_next_version(guess_next_version, '{guessed}')
+
+    return {
+        'version_scheme': semver_version,
+        'local_scheme': 'no-local-version',
+        'write_to': "alcli/version.py",
+    }
+
+
 setup(
     name='alcli',
-    use_scm_version=True,
+    use_scm_version=version_generator,
     setup_requires=['setuptools_scm'],
     url='https://github.com/alertlogic/alcli',
     license='MIT license',
