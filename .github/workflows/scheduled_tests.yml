@@ -8,12 +8,15 @@ on:
 
 jobs:
   test_code:
+    runs-on: ubuntu-latest
     steps:
         - uses: ./.github/workflows/run_tests
   test_python_build:
+    runs-on: ubuntu-latest
     steps:
         - uses: ./.github/workflows/build_python
   test_windows_build:
+    runs-on: windows-latest
     steps:
         - uses: ./.github/workflows/build_windows
   alert:
