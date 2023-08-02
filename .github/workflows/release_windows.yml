@@ -5,13 +5,12 @@ on:
       - created
 jobs:
   test:
-    runs-on: ubuntu-latest
-    steps:
-        - uses: ./.github/workflows/run_tests
+    uses: ./.github/workflows/run_tests.yml
   release:
     runs-on: windows-latest
     steps:
       - uses: ./.github/workflows/build_windows
+        secrets: inherit
       - name: Upload Release executable setup
         id: upload-exe-asset
         uses: actions/upload-release-asset@v1
