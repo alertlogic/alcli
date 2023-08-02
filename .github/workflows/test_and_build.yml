@@ -1,0 +1,32 @@
+name: Run Tests and Build
+
+on:
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    # Run every day at 12:00 UTC
+    - cron:  '00 12 * * *'  
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/run_tests
+  build_python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build_python
+  build_windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build_windows
+  alert:
+    runs-on: ubuntu-latest
+    if: failure()
+    steps:
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/pagerduty_alert

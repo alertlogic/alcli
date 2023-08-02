@@ -1,31 +1,11 @@
-name: Run Scheduled Tests
+name: Alert Pager Duty
 
-on:
-  schedule:
-    # * is a special character in YAML so you have to quote this string
-    # Run every day at 12:00 UTC
-    - cron:  '00 12 * * *'  
+on: 
   workflow_dispatch:
 
 jobs:
-  test_code:
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v3
-        - uses: ./.github/workflows/run_tests
-  test_python_build:
-    runs-on: ubuntu-latest
-    steps:
-        - uses: actions/checkout@v3
-        - uses: ./.github/workflows/build_python
-  test_windows_build:
-    runs-on: windows-latest
-    steps:
-        - uses: actions/checkout@v3
-        - uses: ./.github/workflows/build_windows
   alert:
     runs-on: ubuntu-latest
-    if: failure()
     steps:
       - name: Run Tests
         run: |

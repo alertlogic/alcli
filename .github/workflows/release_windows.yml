@@ -7,11 +7,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-        - uses: ./.github/workflows/run_tests
+        - uses: actions/checkout@v3
+        - uses: ./.github/actions/run_tests
   release:
     runs-on: windows-latest
     steps:
-      - uses: ./.github/workflows/build_windows
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build_windows
       - name: Upload Release executable setup
         id: upload-exe-asset
         uses: actions/upload-release-asset@v1

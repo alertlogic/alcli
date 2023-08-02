@@ -8,11 +8,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-        - uses: ./.github/workflows/run_tests
+        - uses: actions/checkout@v3
+        - uses: ./.github/actions/run_tests
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: ./.github/workflows/build_python
+      - uses: actions/checkout@v3
+      - uses: ./.github/actions/build_python
       - name: Build and publish
         env:
           TWINE_USERNAME: __token__

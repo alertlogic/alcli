@@ -1,6 +1,5 @@
 name: Build python distribution 
 on:
-  pull_request:
   workflow_call:
 
 jobs:

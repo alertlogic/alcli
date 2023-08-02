@@ -1,6 +1,5 @@
 name: Build and sign windows artifacts
 on:
-  pull_request:
   workflow_call:
 
 jobs:
