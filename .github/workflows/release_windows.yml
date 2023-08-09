@@ -11,23 +11,16 @@ jobs:
     steps:
       - uses: ./.github/workflows/build_windows
         secrets: inherit
-      - name: Upload Release executable setup
-        id: upload-exe-asset
-        uses: actions/upload-release-asset@v1
+      - name: Prepare Assets
+        run: |
+          mv dist/alcli_setup.exe AlertlogicCLISetup.exe
+          mv dist/alcli_setup.msi AlertlogicCLISetup.msi
+      - name: Upload Release Assets
+        id: upload-assets
+        uses: softprops/action-gh-release@v1
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-            upload_url: ${{ github.event.release.upload_url }}
-            asset_path: dist\alcli_setup.exe
-            asset_name: AlertlogicCLISetup.exe
-            asset_content_type: application/zip
-      - name: Upload Release MSI setup
-        id: upload-msi-asset
-        uses: actions/upload-release-asset@v1
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-            upload_url: ${{ github.event.release.upload_url }}
-            asset_path: dist\alcli_setup.msi
-            asset_name: AlertlogicCLISetup.msi
-            asset_content_type: application/zip
+          files: |
+            AlertlogicCLISetup.exe
+            AlertlogicCLISetup.msi
