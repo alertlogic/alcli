@@ -7,11 +7,11 @@ on:
 jobs:
   test:
     uses: ./.github/workflows/run_tests.yml
+  setup:
+    uses: ./.github/workflows/build_python.yml
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: ./.github/workflows/build_python
       - name: Build and publish
         env:
           TWINE_USERNAME: __token__
