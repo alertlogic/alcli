@@ -8,7 +8,7 @@ The `pip` package manager for Python is used to install, upgrade and remove Aler
 
 ## **Installing the current version of the Alert Logic CLI**
 
-Alert Logic CLI only works on Python 3.7 or higher. 
+Alert Logic CLI only works on Python 3.8 or higher.
 Please follow this instructions on how to install Python on your system: <https://www.python.org/downloads/>
 
 
