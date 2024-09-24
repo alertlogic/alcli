@@ -47,7 +47,7 @@ jobs:
           mv dist/alcli_setup.msi AlertlogicCLISetup.msi
       - name: Upload Release Assets
         id: upload-assets
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         env:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
