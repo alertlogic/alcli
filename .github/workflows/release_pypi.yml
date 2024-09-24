@@ -10,6 +10,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: ./.github/workflows/build_python
       - name: Build and publish
         env:
